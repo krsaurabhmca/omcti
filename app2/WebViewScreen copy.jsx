@@ -3,14 +3,14 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  Dimensions,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    Dimensions,
+    SafeAreaView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 
@@ -177,7 +177,7 @@ const WebViewScreen = () => {
       end={{ x: 1, y: 1 }}
       style={styles.slimHeader}
     >
-      <StatusBar barStyle="light-content" backgroundColor="#234785" translucent={false} />
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       
       <View style={styles.headerContent}>
         {/* Back Arrow */}
@@ -194,11 +194,11 @@ const WebViewScreen = () => {
           <View style={styles.titleRow}>
             <Ionicons name="book" size={16} color="#ffeb44" />
             <Text style={styles.bookTitle} numberOfLines={1}>
-              {bookTitle || 'Document'}
+              {bookTitle || 'Book'}
             </Text>
           </View>
           <Text style={styles.chapterTitle} numberOfLines={1}>
-            {title || 'Viewing'}
+            {title || 'Chapter'}
           </Text>
         </View>
 
@@ -215,18 +215,24 @@ const WebViewScreen = () => {
 
   const renderError = () => (
     <View style={styles.errorContainer}>
-      <View style={styles.errorIcon}>
-        <Ionicons name="document-text-outline" size={32} color="#ffeb44" />
-      </View>
+      <LinearGradient
+        colors={['#ff6b6b', '#ee5a52']}
+        style={styles.errorIcon}
+      >
+        <Ionicons name="document-text-outline" size={32} color="#ffffff" />
+      </LinearGradient>
       <Text style={styles.errorTitle}>Document Not Available</Text>
       <Text style={styles.errorMessage}>
         The document couldn't be loaded. Please check your connection and try again.
       </Text>
       <TouchableOpacity style={styles.errorButton} onPress={reload}>
-        <View style={styles.errorButtonGradient}>
+        <LinearGradient
+          colors={['#ffeb44', '#ffd700']}
+          style={styles.errorButtonGradient}
+        >
           <Ionicons name="refresh" size={18} color="#234785" />
           <Text style={styles.errorButtonText}>Retry Loading</Text>
-        </View>
+        </LinearGradient>
       </TouchableOpacity>
     </View>
   );
@@ -286,7 +292,7 @@ const WebViewScreen = () => {
             originWhitelist={['*']}
             mixedContentMode="compatibility"
             setSupportMultipleWindows={false}
-            allowsInlineMediaPlayback={true}
+            allowsInlineMediaPlaybook={true}
             mediaPlaybackRequiresUserAction={false}
             onShouldStartLoadWithRequest={(request) => {
               // Block downloads but allow navigation
@@ -307,7 +313,7 @@ const WebViewScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fc',
+    backgroundColor: '#1a2744',
   },
   
   // Slim Header Styles
@@ -343,10 +349,9 @@ const styles = StyleSheet.create({
   },
   bookTitle: {
     fontSize: 14,
-    color: '#ffeb44',
+    color: 'rgba(255, 255, 255, 0.9)',
     fontWeight: '500',
     marginLeft: 6,
-    opacity: 0.95,
   },
   chapterTitle: {
     fontSize: 18,
@@ -369,7 +374,40 @@ const styles = StyleSheet.create({
   },
   webView: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#f5f5f5',
+  },
+
+  // Bottom Info Styles
+  bottomInfo: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  infoContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    paddingBottom: 16,
+  },
+  infoContent: {
+    alignItems: 'center',
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 2,
+  },
+  infoText: {
+    fontSize: 12,
+    color: '#ffeb44',
+    marginLeft: 8,
+    fontWeight: '500',
+  },
+  infoHint: {
+    fontSize: 11,
+    color: 'rgba(255, 235, 68, 0.6)',
+    marginLeft: 8,
+    fontStyle: 'italic',
   },
 
   // Loading Styles
@@ -393,14 +431,13 @@ const styles = StyleSheet.create({
   loadingTitle: {
     fontSize: 18,
     color: '#ffeb44',
-    fontWeight: '600',
+    fontWeight: '700',
     marginBottom: 6,
   },
   loadingSubtitle: {
     fontSize: 14,
-    color: '#ffeb44',
+    color: 'rgba(255, 255, 255, 0.9)',
     marginBottom: 30,
-    opacity: 0.85,
   },
   loadingFeatures: {
     alignItems: 'center',
@@ -412,9 +449,8 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontSize: 12,
-    color: '#ffeb44',
+    color: 'rgba(255, 255, 255, 0.9)',
     marginLeft: 8,
-    opacity: 0.85,
   },
 
   // Error Styles
@@ -423,7 +459,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#f8f9fc',
+    backgroundColor: '#1a2744',
   },
   errorIcon: {
     width: 70,
@@ -432,22 +468,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
-    backgroundColor: '#234785',
-    shadowColor: '#234785',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 5,
   },
   errorTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#234785',
+    color: '#ffffff',
     marginBottom: 8,
   },
   errorMessage: {
     fontSize: 14,
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.8)',
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 24,
@@ -455,19 +485,17 @@ const styles = StyleSheet.create({
   errorButton: {
     borderRadius: 25,
     overflow: 'hidden',
+    shadowColor: '#234785',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   errorButtonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingVertical: 12,
-    backgroundColor: '#ffeb44',
-    borderRadius: 25,
-    shadowColor: '#234785',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
   },
   errorButtonText: {
     color: '#234785',

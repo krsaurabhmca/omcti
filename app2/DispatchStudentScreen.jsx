@@ -131,40 +131,25 @@ const DispatchStudentScreen = ({ navigation, route }) => {
     });
   };
 
-  const handleLinkPress = (baseUrl, studentInfo, type) => {
+  const handleLinkPress = (baseUrl, studentId, type) => {
     if (!baseUrl) {
-      Alert.alert('Not Available', `${type} document is not available`);
+      Alert.alert('Not Available', `${type} link is not available`);
       return;
     }
 
     try {
-      // Construct the URL with student-specific parameters if needed
-      let documentUrl = baseUrl;
-      
-      // If the URL needs student ID appended or replaced
-      // You can modify this based on how your URLs are structured
-      if (baseUrl.includes('{id}')) {
-        documentUrl = baseUrl.replace('{id}', studentInfo.id);
-      } else if (!baseUrl.includes(studentInfo.id)) {
-        // If URL doesn't contain student ID, you might need to append it
-        // Adjust this based on your URL structure
-        documentUrl = baseUrl;
-      }
+      let studentSpecificUrl = baseUrl;
 
-      // Navigate to WebViewScreen with the document URL
       router.push({
-        pathname: "WebViewScreen",
+        pathname: "PdfViewer",
         params: {
-          url: documentUrl,
-          title: `${type} - ${studentInfo.student_name}`,
-          bookTitle: studentInfo.course_name || 'Document',
-          from_page: 1,
-          to_page: 1
+          url: studentSpecificUrl,
+          title: type || "Document",
         },
       });
     } catch (error) {
-      console.error(`Error opening ${type}:`, error);
-      Alert.alert("Error", `Failed to open ${type} document`);
+      console.error("Error opening PDF:", error);
+      Alert.alert("Error", "Failed to open PDF");
     }
   };
 
@@ -234,7 +219,7 @@ const DispatchStudentScreen = ({ navigation, route }) => {
               styles.msButton,
               !responseLinks.ms && styles.disabledButton
             ]}
-            onPress={() => handleLinkPress(responseLinks.ms, item, 'Marksheet')}
+            onPress={() => handleLinkPress(responseLinks.ms, item.id, 'Marksheet')}
             disabled={!responseLinks.ms}
           >
             <Ionicons name="document-text" size={16} color="#fff" />
@@ -247,7 +232,7 @@ const DispatchStudentScreen = ({ navigation, route }) => {
               styles.cerButton,
               !responseLinks.cer && styles.disabledButton
             ]}
-            onPress={() => handleLinkPress(responseLinks.cer, item, 'Certificate')}
+            onPress={() => handleLinkPress(responseLinks.cer, item.id, 'Certificate')}
             disabled={!responseLinks.cer}
           >
             <Ionicons name="ribbon" size={16} color="#fff" />
@@ -260,7 +245,7 @@ const DispatchStudentScreen = ({ navigation, route }) => {
               styles.acButton,
               !responseLinks.ac && styles.disabledButton
             ]}
-            onPress={() => handleLinkPress(responseLinks.ac, item, 'Admit Card')}
+            onPress={() => handleLinkPress(responseLinks.ac, item.id, 'AC Document')}
             disabled={!responseLinks.ac}
           >
             <Ionicons name="shield-checkmark" size={16} color="#fff" />
@@ -289,7 +274,7 @@ const DispatchStudentScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <LinearGradient colors={['#234785', '#3d6aa5']} style={styles.header}>
+      <LinearGradient colors={['#234785', '#1a3666']} style={styles.header}>
         <View style={styles.headerContent}>
           <TouchableOpacity
             style={styles.backButton}
@@ -431,7 +416,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     backgroundColor: '#fff',
     borderBottomWidth: 2,
-    borderBottomColor: '#ffeb44',
+    borderBottomColor: '#234785',
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -445,7 +430,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 12,
     borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderColor: '#234785',
   },
   searchIcon: {
     marginRight: 12,
@@ -465,6 +450,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffeb44',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#234785',
   },
   listContainer: {
     padding: 20,
@@ -570,7 +557,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#10B981',
   },
   acButton: {
-    backgroundColor: '#3d6aa5',
+    backgroundColor: '#3a5fa0',
   },
   disabledButton: {
     backgroundColor: '#9CA3AF',

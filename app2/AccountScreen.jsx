@@ -55,57 +55,58 @@ const AccountScreen = () => {
   };
 
   const fetchTransactions = async (page = 1 ) => {
-    try {
-      setLoading(true);
-      console.log(`=== FETCHING TRANSACTIONS PAGE ${page} ===`);
+  try {
+    setLoading(true);
+    console.log(`=== FETCHING TRANSACTIONS PAGE ${page} ===`);
 
-      const response = await fetch('https://omcti.in/apprise/api.php?task=acc_txn', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          center_id: center_id
-        })
-      });
+    const response = await fetch('https://omcti.in/apprise/api.php?task=acc_txn', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        center_id: center_id
+      })
+    });
 
-      const data = await response.json();
+    const data = await response.json();
+// console.log(data);
+    if (data.status === 'success' && Array.isArray(data.data)) {
+      const transactionData = data.data;
+      const totalItems = transactionData.length;
 
-      if (data.status === 'success' && Array.isArray(data.data)) {
-        const transactionData = data.data;
-        const totalItems = transactionData.length;
+      // Client-side pagination
+      const startIndex = (page - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedData = transactionData.slice(startIndex, endIndex);
 
-        // Client-side pagination
-        const startIndex = (page - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const paginatedData = transactionData.slice(startIndex, endIndex);
+      setTransactions(paginatedData);
+      setTotalTransactions(totalItems);
+      setTotalPages(Math.ceil(totalItems / itemsPerPage));
+      setCurrentPage(page);
 
-        setTransactions(paginatedData);
-        setTotalTransactions(totalItems);
-        setTotalPages(Math.ceil(totalItems / itemsPerPage));
-        setCurrentPage(page);
+      // Summary calculation from full data
+      calculateSummary(transactionData);
 
-        // Summary calculation from full data
-        calculateSummary(transactionData);
-
-        console.log('✅ Transactions loaded successfully');
-        console.log('Total transactions:', totalItems);
-        console.log('Current page:', page);
-        console.log('Total pages:', Math.ceil(totalItems / itemsPerPage));
-        console.log('Showing transactions:', paginatedData.length);
-      } else {
-        console.log('❌ Failed to fetch transactions data');
-        Alert.alert('Error', 'Failed to fetch transactions data');
-      }
-    } catch (error) {
-      console.error('❌ Error fetching transactions:', error);
-      Alert.alert('Error', 'Network error. Please check your connection.');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
+      console.log('✅ Transactions loaded successfully');
+      console.log('Total transactions:', totalItems);
+      console.log('Current page:', page);
+      console.log('Total pages:', Math.ceil(totalItems / itemsPerPage));
+      console.log('Showing transactions:', paginatedData.length);
+    } else {
+      console.log('❌ Failed to fetch transactions data');
+      Alert.alert('Error', 'Failed to fetch transactions data');
     }
-  };
+  } catch (error) {
+    console.error('❌ Error fetching transactions:', error);
+    Alert.alert('Error', 'Network error. Please check your connection.');
+  } finally {
+    setLoading(false);
+    setRefreshing(false);
+  }
+};
+
 
   const calculateSummary = (allTransactions) => {
     const totalIncome = allTransactions
@@ -213,19 +214,19 @@ const AccountScreen = () => {
         <View style={styles.transactionBody}>
           <View style={styles.transactionRow}>
             <View style={styles.transactionDetail}>
-              <Ionicons name="calendar-outline" size={16} color="#234785" />
+              <Ionicons name="calendar-outline" size={16} color="#666" />
               <Text style={styles.transactionLabel}>Date:</Text>
               <Text style={styles.transactionValue}>{formatDate(item.txn_date)}</Text>
             </View>
             <View style={styles.transactionDetail}>
-              <Ionicons name="card-outline" size={16} color="#234785" />
+              <Ionicons name="card-outline" size={16} color="#666" />
               <Text style={styles.transactionLabel}>Mode:</Text>
               <Text style={[styles.transactionValue, styles.modeText]}>{item.txn_mode}</Text>
             </View>
           </View>
           
           <View style={styles.remarksContainer}>
-            <Ionicons name="document-text-outline" size={16} color="#234785" />
+            <Ionicons name="document-text-outline" size={16} color="#666" />
             <Text style={styles.transactionLabel}>Remarks:</Text>
             <Text style={styles.remarksText}>{item.txn_remarks}</Text>
           </View>
@@ -257,7 +258,7 @@ const AccountScreen = () => {
           onPress={() => handlePageChange(1)}
           disabled={currentPage === 1}
         >
-          <Ionicons name="play-skip-back" size={16} color={currentPage === 1 ? '#ccc' : '#234785'} />
+          <Ionicons name="play-skip-back" size={16} color={currentPage === 1 ? '#ccc' : '#4F46E5'} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -265,7 +266,7 @@ const AccountScreen = () => {
           onPress={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          <Ionicons name="chevron-back" size={16} color={currentPage === 1 ? '#ccc' : '#234785'} />
+          <Ionicons name="chevron-back" size={16} color={currentPage === 1 ? '#ccc' : '#4F46E5'} />
         </TouchableOpacity>
 
         <View style={styles.pageNumbers}>
@@ -293,7 +294,7 @@ const AccountScreen = () => {
           onPress={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
-          <Ionicons name="chevron-forward" size={16} color={currentPage === totalPages ? '#ccc' : '#234785'} />
+          <Ionicons name="chevron-forward" size={16} color={currentPage === totalPages ? '#ccc' : '#4F46E5'} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -301,7 +302,7 @@ const AccountScreen = () => {
           onPress={() => handlePageChange(totalPages)}
           disabled={currentPage === totalPages}
         >
-          <Ionicons name="play-skip-forward" size={16} color={currentPage === totalPages ? '#ccc' : '#234785'} />
+          <Ionicons name="play-skip-forward" size={16} color={currentPage === totalPages ? '#ccc' : '#4F46E5'} />
         </TouchableOpacity>
       </View>
     );
@@ -326,13 +327,13 @@ const AccountScreen = () => {
       </View>
       
       <LinearGradient 
-        colors={summary.balance >= 0 ? ['#234785', '#3d6aa5'] : ['#F59E0B', '#D97706']} 
+        colors={summary.balance >= 0 ? ['#6366F1', '#4F46E5'] : ['#F59E0B', '#D97706']} 
         style={styles.balanceCard}
       >
         <Ionicons 
           name={summary.balance >= 0 ? "trending-up" : "trending-down"} 
           size={28} 
-          color="#ffeb44" 
+          color="#fff" 
         />
         <Text style={styles.balanceLabel}>Net Balance</Text>
         <Text style={styles.balanceValue}>{formatCurrency(summary.balance)}</Text>
@@ -363,22 +364,22 @@ const AccountScreen = () => {
   if (loading && transactions.length === 0) {
     return (
       <View style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#234785" translucent={false} />
-        <LinearGradient colors={['#234785', '#3d6aa5']} style={styles.header}>
+        <StatusBar barStyle="light-content" backgroundColor="#4F46E5" />
+        <LinearGradient colors={['#4F46E5', '#7C3AED']} style={styles.header}>
           <TouchableOpacity 
             style={styles.backButton} 
             onPress={() => navigation.goBack()}
           >
-            <Ionicons name="arrow-back" size={24} color="#ffeb44" />
+            <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Account Ledger</Text>
           <TouchableOpacity style={styles.addButton} onPress={navigateToAddEntry}>
-            <Ionicons name="add" size={24} color="#ffeb44" />
+            <Ionicons name="add" size={24} color="#fff" />
           </TouchableOpacity>
         </LinearGradient>
         
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#234785" />
+          <ActivityIndicator size="large" color="#4F46E5" />
           <Text style={styles.loadingText}>Loading transactions...</Text>
         </View>
       </View>
@@ -387,19 +388,19 @@ const AccountScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#234785" translucent={false} />
+      <StatusBar barStyle="light-content" backgroundColor="#4F46E5" />
       
       {/* Header */}
-      <LinearGradient colors={['#234785', '#3d6aa5']} style={styles.header}>
+      <LinearGradient colors={['#4F46E5', '#7C3AED']} style={styles.header}>
         <TouchableOpacity 
           style={styles.backButton} 
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color="#ffeb44" />
+          <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Account Ledger</Text>
         <TouchableOpacity style={styles.addButton} onPress={navigateToAddEntry}>
-          <Ionicons name="add" size={24} color="#ffeb44" />
+          <Ionicons name="add" size={24} color="#fff" />
         </TouchableOpacity>
       </LinearGradient>
 
@@ -415,8 +416,8 @@ const AccountScreen = () => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            colors={['#234785']}
-            tintColor="#234785"
+            colors={['#4F46E5']}
+            tintColor="#4F46E5"
           />
         }
         ListEmptyComponent={
@@ -430,7 +431,7 @@ const AccountScreen = () => {
 
       {loading && transactions.length > 0 && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="small" color="#234785" />
+          <ActivityIndicator size="small" color="#4F46E5" />
         </View>
       )}
     </View>
@@ -450,7 +451,7 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
     paddingHorizontal: 20,
     elevation: 8,
-    shadowColor: '#234785',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4.65,
@@ -458,12 +459,12 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 235, 68, 0.2)',
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#ffeb44',
+    color: '#fff',
     flex: 1,
     textAlign: 'center',
     marginHorizontal: 10,
@@ -471,7 +472,7 @@ const styles = StyleSheet.create({
   addButton: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 235, 68, 0.2)',
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   loadingContainer: {
     flex: 1,
@@ -536,22 +537,22 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
   balanceLabel: {
-    color: '#ffeb44',
+    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
     marginTop: 8,
-    opacity: 0.95,
+    opacity: 0.9,
   },
   balanceValue: {
-    color: '#ffeb44',
+    color: '#fff',
     fontSize: 32,
     fontWeight: 'bold',
     marginTop: 4,
   },
   balanceSubtext: {
-    color: '#ffeb44',
+    color: '#fff',
     fontSize: 14,
-    opacity: 0.85,
+    opacity: 0.8,
     marginTop: 4,
   },
   statsRow: {
@@ -564,8 +565,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    borderTopWidth: 3,
-    borderTopColor: '#ffeb44',
   },
   statItem: {
     flex: 1,
@@ -574,7 +573,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#234785',
+    color: '#2c3e50',
   },
   statLabel: {
     fontSize: 12,
@@ -583,8 +582,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   statDivider: {
-    width: 2,
-    backgroundColor: '#ffeb44',
+    width: 1,
+    backgroundColor: '#e1e8ed',
     marginHorizontal: 16,
   },
   transactionCard: {
@@ -597,8 +596,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    borderLeftWidth: 4,
-    borderLeftColor: '#ffeb44',
   },
   transactionHeader: {
     flexDirection: 'row',
@@ -612,7 +609,7 @@ const styles = StyleSheet.create({
   transactionNumber: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#234785',
+    color: '#2c3e50',
   },
   transactionId: {
     fontSize: 12,
@@ -647,11 +644,11 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   amountContainer: {
-    backgroundColor: '#fff9e6',
+    backgroundColor: '#f8f9fc',
     padding: 16,
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#ffeb44',
+    borderLeftColor: '#4F46E5',
     marginBottom: 4,
   },
   amountRow: {
@@ -709,33 +706,28 @@ const styles = StyleSheet.create({
   transactionValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#234785',
+    color: '#2c3e50',
   },
   modeText: {
-    backgroundColor: '#fff9e6',
+    backgroundColor: '#f3f4f6',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 8,
     fontSize: 12,
-    color: '#234785',
   },
   remarksContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#fff9e6',
+    backgroundColor: '#f8f9fc',
     paddingVertical: 8,
-    paddingHorizontal: 12,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ffeb44',
   },
   remarksText: {
     flex: 1,
     fontSize: 14,
-    color: '#234785',
+    color: '#2c3e50',
     marginLeft: 8,
     lineHeight: 18,
-    fontWeight: '500',
   },
   paginationContainer: {
     flexDirection: 'row',
@@ -756,12 +748,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    borderWidth: 2,
-    borderColor: '#ffeb44',
   },
   disabledButton: {
     backgroundColor: '#f3f4f6',
-    borderColor: '#e5e7eb',
     elevation: 0,
   },
   pageNumbers: {
@@ -781,21 +770,18 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 1,
-    borderWidth: 2,
-    borderColor: '#ffeb44',
   },
   activePageButton: {
-    backgroundColor: '#234785',
-    borderColor: '#234785',
+    backgroundColor: '#4F46E5',
     elevation: 3,
   },
   pageButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#234785',
+    color: '#666',
   },
   activePageButtonText: {
-    color: '#ffeb44',
+    color: '#fff',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -825,8 +811,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    borderWidth: 2,
-    borderColor: '#ffeb44',
   },
 });
 

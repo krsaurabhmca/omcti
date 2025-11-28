@@ -268,6 +268,7 @@ const AdminDashboard = ({ navigation, route }) => {
   // Security Functions
   const enableScreenProtection = async () => {
     try {
+      // Prevent screenshots and screen recording
       await ScreenCapture.preventScreenCaptureAsync();
       setIsScreenProtected(true);
       console.log("Screen protection enabled");
@@ -278,6 +279,7 @@ const AdminDashboard = ({ navigation, route }) => {
 
   const disableScreenProtection = async () => {
     try {
+      // Allow screenshots and screen recording (when leaving the screen)
       await ScreenCapture.allowScreenCaptureAsync();
       setIsScreenProtected(false);
       console.log("Screen protection disabled");
@@ -286,48 +288,42 @@ const AdminDashboard = ({ navigation, route }) => {
     }
   };
 
+  // Screen capture event listener
   const setupScreenCaptureListener = () => {
     const subscription = ScreenCapture.addScreenshotListener(() => {
       setShowSecurityAlert(true);
+      // Log security event
       console.log("Screenshot attempt detected!");
+      
+      // Optional: Send security alert to server
+      // logSecurityEvent('screenshot_attempt');
     });
+
     return subscription;
   };
 
+  // App state handler for additional security
   const handleAppStateChange = (nextAppState) => {
-    if (nextAppState === "background" || nextAppState === "inactive") {
+    if (nextAppState === 'background' || nextAppState === 'inactive') {
+      // App is going to background, ensure screen protection
       enableScreenProtection();
-    } else if (nextAppState === "active") {
+    } else if (nextAppState === 'active') {
+      // App is coming to foreground, re-enable protection
       enableScreenProtection();
     }
   };
 
-  // Configure StatusBar
-  const configureStatusBar = useCallback(() => {
-    StatusBar.setBarStyle("light-content", true);
-    if (Platform.OS === "android") {
-      StatusBar.setBackgroundColor("#234785", true);
-      StatusBar.setTranslucent(false);
-    }
-  }, []);
-
-  // Focus effect for screen protection and StatusBar
+  // Focus effect for screen protection
   useFocusEffect(
     useCallback(() => {
-      // Configure StatusBar when screen is focused
-      configureStatusBar();
-
       // Enable protection when screen is focused
       enableScreenProtection();
-
+      
       // Setup screenshot listener
       const screenshotSubscription = setupScreenCaptureListener();
-
+      
       // Setup app state listener
-      const appStateSubscription = AppState.addEventListener(
-        "change",
-        handleAppStateChange
-      );
+      const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
 
       return () => {
         // Cleanup when screen loses focus
@@ -335,7 +331,7 @@ const AdminDashboard = ({ navigation, route }) => {
         screenshotSubscription?.remove();
         appStateSubscription?.remove();
       };
-    }, [configureStatusBar])
+    }, [])
   );
 
   // ✅ Load userData from AsyncStorage
@@ -400,6 +396,7 @@ const AdminDashboard = ({ navigation, route }) => {
         style: "destructive",
         onPress: async () => {
           try {
+            // Disable screen protection before logout
             await disableScreenProtection();
             await AsyncStorage.multiRemove(["userData", "userType", "userId"]);
             router.replace("LoginScreen");
@@ -482,7 +479,7 @@ const AdminDashboard = ({ navigation, route }) => {
     },
     {
       id: 4,
-      title: "Verify Result",
+      title: "Verify Result ",
       icon: "document-text-outline",
       color: "#ffd700",
       path: "PendingResultScreen",
@@ -504,16 +501,7 @@ const AdminDashboard = ({ navigation, route }) => {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container} edges={["bottom", "left", "right"]}>
-        <StatusBar barStyle="light-content" backgroundColor="#234785" />
-        <View style={styles.loadingHeader}>
-          <LinearGradient
-            colors={["#234785", "#1a5a9e", "#2d7ab8"]}
-            style={styles.loadingHeaderGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          />
-        </View>
+      <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#234785" />
           <Text style={styles.loadingText}>Loading Dashboard...</Text>
@@ -525,333 +513,299 @@ const AdminDashboard = ({ navigation, route }) => {
   const walletInfo = getWalletBalance();
 
   return (
-    <View style={styles.mainContainer}>
-      {/* StatusBar Configuration */}
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="#234785"
-        translucent={false}
-      />
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#234785" />
 
-      <SafeAreaView style={styles.container} edges={["bottom", "left", "right"]}>
-        <LinearGradient
-          colors={["#234785", "#1a5a9e", "#2d7ab8"]}
-          style={styles.header}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-        >
-          <View style={styles.headerContent}>
-            <View style={styles.headerInfo}>
-              <Text style={styles.welcomeText}>Admin Control Panel</Text>
-              <Text
-                style={styles.nameText}
-                numberOfLines={1}
-                adjustsFontSizeToFit
-              >
-                {adminData?.full_name || adminData?.user_name || "Administrator"}
-              </Text>
-              <Text style={styles.roleText}>System Administrator</Text>
-            </View>
-            <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-              <Ionicons
-                name="log-out-outline"
-                size={responsiveSize(24)}
-                color="#ffeb44"
-              />
-            </TouchableOpacity>
+      <LinearGradient
+        colors={["#234785", "#1a5a9e", "#2d7ab8"]}
+        style={styles.header}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+      >
+        <View style={styles.headerContent}>
+          <View style={styles.headerInfo}>
+            <Text style={styles.welcomeText}>Admin Control Panel</Text>
+            <Text
+              style={styles.nameText}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+            >
+              {adminData?.full_name || adminData?.user_name || "Administrator"}
+            </Text>
+            <Text style={styles.roleText}>System Administrator</Text>
           </View>
-        </LinearGradient>
-
-        <ScrollView
-          style={styles.content}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={["#234785"]}
-              tintColor="#234785"
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+            <Ionicons
+              name="log-out-outline"
+              size={responsiveSize(24)}
+              color="#ffeb44"
             />
-          }
-        >
-          {/* Overview Stats */}
-          <View style={styles.overviewContainer}>
-            <Text style={styles.sectionTitle}>System Overview</Text>
-            <View style={styles.overviewGrid}>
-              <View style={[styles.overviewCard, { borderLeftColor: "#4CAF50" }]}>
-                <View style={styles.overviewHeader}>
-                  <Ionicons
-                    name="people"
-                    size={responsiveSize(24)}
-                    color="#4CAF50"
-                  />
-                  <Text style={styles.overviewValue}>
-                    {getTotalStudents().toLocaleString()}
-                  </Text>
-                </View>
-                <Text style={styles.overviewLabel}>Total Students</Text>
-                <Text style={styles.overviewSubtext}>All registrations</Text>
-              </View>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
 
-              <View style={[styles.overviewCard, { borderLeftColor: "#234785" }]}>
-                <View style={styles.overviewHeader}>
-                  <Ionicons
-                    name="today"
-                    size={responsiveSize(24)}
-                    color="#234785"
-                  />
-                  <Text style={styles.overviewValue}>{getTodayWork()}</Text>
-                </View>
-                <Text style={styles.overviewLabel}>Today's Activities</Text>
-                <Text style={styles.overviewSubtext}>Processed items</Text>
-              </View>
-
-              <View style={[styles.overviewCard, { borderLeftColor: "#ffeb44" }]}>
-                <View style={styles.overviewHeader}>
-                  <Ionicons
-                    name="school"
-                    size={responsiveSize(24)}
-                    color="#ffb300"
-                  />
-                  <Text style={styles.overviewValue}>{getTodayAdmissions()}</Text>
-                </View>
-                <Text style={styles.overviewLabel}>New Admissions</Text>
-                <Text style={styles.overviewSubtext}>Today's enrollments</Text>
-              </View>
-
-              <View style={[styles.overviewCard, { borderLeftColor: "#1a5a9e" }]}>
-                <View style={styles.overviewHeader}>
-                  <Ionicons
-                    name="business"
-                    size={responsiveSize(24)}
-                    color="#1a5a9e"
-                  />
-                  <Text style={styles.overviewValue}>
-                    {dashboardData?.center_today_admission?.length || 0}
-                  </Text>
-                </View>
-                <Text style={styles.overviewLabel}>Active Centers</Text>
-                <Text style={styles.overviewSubtext}>With admissions today</Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Quick Actions Dashboard */}
-          <View style={styles.actionsSection}>
-            <Text style={styles.sectionTitle}>Quick Actions</Text>
-            <View style={styles.dashboardGrid}>
-              {adminItems.map((item) => (
-                <TouchableOpacity
-                  key={item.id}
-                  style={[styles.actionCard, { width: getCardWidth() }]}
-                  onPress={() => handleCardPress(item.path)}
-                  activeOpacity={0.8}
-                >
-                  <LinearGradient
-                    colors={[item.color, item.color + "CC"]}
-                    style={styles.actionIconContainer}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                  >
-                    <Ionicons
-                      name={item.icon}
-                      size={responsiveSize(24)}
-                      color={
-                        item.color === "#ffeb44" || item.color === "#ffd700"
-                          ? "#234785"
-                          : "#fff"
-                      }
-                    />
-                  </LinearGradient>
-                  <Text style={styles.actionTitle} numberOfLines={2}>
-                    {item.title}
-                  </Text>
-                  <Ionicons name="chevron-forward" size={16} color="#999" />
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          {/* Financial Dashboard */}
-          <View style={styles.financialDashboard}>
-            <Text style={styles.sectionTitle}>Financial Dashboard</Text>
-            <View style={styles.financialMainCard}>
-              <LinearGradient
-                colors={["#234785", "#1a5a9e"]}
-                style={styles.balanceCard}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              >
-                <Text style={styles.balanceLabel}>Today Wallet Status</Text>
-                <Text style={styles.balanceAmount}>
-                  ₹{walletInfo.balance.toLocaleString()}
-                </Text>
-                <Text style={styles.balanceSubtext}>Available funds</Text>
-              </LinearGradient>
-            </View>
-
-            <View style={styles.financialSubCards}>
-              <View style={styles.financialSubCard}>
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#234785"]} />
+        }
+      >
+        {/* Overview Stats */}
+        <View style={styles.overviewContainer}>
+          <Text style={styles.sectionTitle}>System Overview</Text>
+          <View style={styles.overviewGrid}>
+            <View style={[styles.overviewCard, { borderLeftColor: "#4CAF50" }]}>
+              <View style={styles.overviewHeader}>
                 <Ionicons
-                  name="arrow-up-circle"
-                  size={responsiveSize(20)}
+                  name="people"
+                  size={responsiveSize(24)}
                   color="#4CAF50"
                 />
-                <Text style={styles.subCardAmount}>
-                  ₹{walletInfo.recharge.toLocaleString()}
+                <Text style={styles.overviewValue}>
+                  {getTotalStudents().toLocaleString()}
                 </Text>
-                <Text style={styles.subCardLabel}>Total Recharged</Text>
               </View>
+              <Text style={styles.overviewLabel}>Total Students</Text>
+              <Text style={styles.overviewSubtext}>All registrations</Text>
+            </View>
 
-              <View style={styles.financialSubCard}>
+            <View style={[styles.overviewCard, { borderLeftColor: "#234785" }]}>
+              <View style={styles.overviewHeader}>
                 <Ionicons
-                  name="arrow-down-circle"
-                  size={responsiveSize(20)}
-                  color="#F44336"
+                  name="today"
+                  size={responsiveSize(24)}
+                  color="#234785"
                 />
-                <Text style={styles.subCardAmount}>
-                  ₹{walletInfo.used.toLocaleString()}
-                </Text>
-                <Text style={styles.subCardLabel}>Amount Used</Text>
+                <Text style={styles.overviewValue}>{getTodayWork()}</Text>
               </View>
+              <Text style={styles.overviewLabel}>Today's Activities</Text>
+              <Text style={styles.overviewSubtext}>Processed items</Text>
+            </View>
 
-              <View style={styles.financialSubCard}>
+            <View style={[styles.overviewCard, { borderLeftColor: "#ffeb44" }]}>
+              <View style={styles.overviewHeader}>
                 <Ionicons
-                  name="trending-up"
-                  size={responsiveSize(20)}
-                  color="#ffeb44"
+                  name="school"
+                  size={responsiveSize(24)}
+                  color="#ffb300"
                 />
-                <Text style={styles.subCardAmount}>
-                  ₹{getCompanyIncome().toLocaleString()}
-                </Text>
-                <Text style={styles.subCardLabel}>Today's Revenue</Text>
+                <Text style={styles.overviewValue}>{getTodayAdmissions()}</Text>
               </View>
+              <Text style={styles.overviewLabel}>New Admissions</Text>
+              <Text style={styles.overviewSubtext}>Today's enrollments</Text>
+            </View>
+
+            <View style={[styles.overviewCard, { borderLeftColor: "#1a5a9e" }]}>
+              <View style={styles.overviewHeader}>
+                <Ionicons
+                  name="business"
+                  size={responsiveSize(24)}
+                  color="#1a5a9e"
+                />
+                <Text style={styles.overviewValue}>
+                  {dashboardData?.center_today_admission?.length || 0}
+                </Text>
+              </View>
+              <Text style={styles.overviewLabel}>Active Centers</Text>
+              <Text style={styles.overviewSubtext}>With admissions today</Text>
             </View>
           </View>
+        </View>
 
-          {/* Performance Metrics */}
-          <PerformanceMetrics dashboardData={dashboardData} />
-
-          {/* Student Distribution Chart */}
-          {dashboardData?.total_student && (
-            <StudentDistributionChart data={dashboardData.total_student} />
-          )}
-
-          {/* Today's Activity Timeline */}
-          {dashboardData?.today_work && (
-            <ActivityTimeline todayWork={dashboardData.today_work} />
-          )}
-
-          {/* Top Performing Centers */}
-          <View style={styles.centersSection}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Center Performance Today</Text>
+        {/* Quick Actions Dashboard */}
+        <View style={styles.actionsSection}>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <View style={styles.dashboardGrid}>
+            {adminItems.map((item) => (
               <TouchableOpacity
-                onPress={() => setShowCenterModal(true)}
-                style={styles.viewAllButton}
+                key={item.id}
+                style={[styles.actionCard, { width: getCardWidth() }]}
+                onPress={() => handleCardPress(item.path)}
+                activeOpacity={0.8}
               >
-                <Text style={styles.viewAllText}>View All</Text>
-                <Ionicons name="arrow-forward" size={16} color="#234785" />
+                <LinearGradient
+                  colors={[item.color, item.color + "CC"]}
+                  style={styles.actionIconContainer}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <Ionicons
+                    name={item.icon}
+                    size={responsiveSize(24)}
+                    color={item.color === "#ffeb44" || item.color === "#ffd700" ? "#234785" : "#fff"}
+                  />
+                </LinearGradient>
+                <Text style={styles.actionTitle} numberOfLines={2}>
+                  {item.title}
+                </Text>
+                <Ionicons name="chevron-forward" size={16} color="#999" />
               </TouchableOpacity>
-            </View>
+            ))}
+          </View>
+        </View>
 
-            <View style={styles.topCentersGrid}>
-              {dashboardData?.center_today_admission
-                ?.slice(0, 3)
-                .map((center, index) => (
-                  <View key={index} style={styles.topCenterCard}>
-                    <View style={styles.centerRankBadge}>
-                      <Text style={styles.centerRankText}>#{index + 1}</Text>
-                    </View>
-                    <Text style={styles.topCenterName} numberOfLines={2}>
-                      {center.center_name}
-                    </Text>
-                    <Text style={styles.topCenterCode}>{center.center_code}</Text>
-                    <View style={styles.topCenterStats}>
-                      <Text style={styles.topCenterAdmissions}>
-                        {center.total}
-                      </Text>
-                      <Text style={styles.topCenterLabel}>Admissions</Text>
-                    </View>
-                  </View>
-                ))}
-            </View>
+        {/* Financial Dashboard */}
+        <View style={styles.financialDashboard}>
+          <Text style={styles.sectionTitle}>Financial Dashboard</Text>
+          <View style={styles.financialMainCard}>
+            <LinearGradient
+              colors={["#234785", "#1a5a9e"]}
+              style={styles.balanceCard}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
+              <Text style={styles.balanceLabel}>Today Wallet Status</Text>
+              <Text style={styles.balanceAmount}>
+                ₹{walletInfo.balance.toLocaleString()}
+              </Text>
+              <Text style={styles.balanceSubtext}>Available funds</Text>
+            </LinearGradient>
           </View>
 
-          {/* System Information */}
-          <View style={styles.systemInfo}>
-            <Text style={styles.sectionTitle}>System Information</Text>
+          <View style={styles.financialSubCards}>
+            <View style={styles.financialSubCard}>
+              <Ionicons
+                name="arrow-up-circle"
+                size={responsiveSize(20)}
+                color="#4CAF50"
+              />
+              <Text style={styles.subCardAmount}>
+                ₹{walletInfo.recharge.toLocaleString()}
+              </Text>
+              <Text style={styles.subCardLabel}>Total Recharged</Text>
+            </View>
 
-            <View style={styles.systemCard}>
-              <View style={styles.systemItem}>
-                <Text style={styles.systemLabel}>Status</Text>
-                <View style={styles.statusContainer}>
-                  <View style={styles.statusDot} />
-                  <Text style={styles.statusText}>
-                    {adminData?.status || "Active"}
+            <View style={styles.financialSubCard}>
+              <Ionicons
+                name="arrow-down-circle"
+                size={responsiveSize(20)}
+                color="#F44336"
+              />
+              <Text style={styles.subCardAmount}>
+                ₹{walletInfo.used.toLocaleString()}
+              </Text>
+              <Text style={styles.subCardLabel}>Amount Used</Text>
+            </View>
+
+            <View style={styles.financialSubCard}>
+              <Ionicons
+                name="trending-up"
+                size={responsiveSize(20)}
+                color="#ffeb44"
+              />
+              <Text style={styles.subCardAmount}>
+                ₹{getCompanyIncome().toLocaleString()}
+              </Text>
+              <Text style={styles.subCardLabel}>Today's Revenue</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Performance Metrics */}
+        <PerformanceMetrics dashboardData={dashboardData} />
+
+        {/* Student Distribution Chart */}
+        {dashboardData?.total_student && (
+          <StudentDistributionChart data={dashboardData.total_student} />
+        )}
+
+        {/* Today's Activity Timeline */}
+        {dashboardData?.today_work && (
+          <ActivityTimeline todayWork={dashboardData.today_work} />
+        )}
+
+        {/* Top Performing Centers */}
+        <View style={styles.centersSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Center Performance Today</Text>
+            <TouchableOpacity
+              onPress={() => setShowCenterModal(true)}
+              style={styles.viewAllButton}
+            >
+              <Text style={styles.viewAllText}>View All</Text>
+              <Ionicons name="arrow-forward" size={16} color="#234785" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.topCentersGrid}>
+            {dashboardData?.center_today_admission
+              ?.slice(0, 3)
+              .map((center, index) => (
+                <View key={index} style={styles.topCenterCard}>
+                  <View style={styles.centerRankBadge}>
+                    <Text style={styles.centerRankText}>#{index + 1}</Text>
+                  </View>
+                  <Text style={styles.topCenterName} numberOfLines={2}>
+                    {center.center_name}
                   </Text>
+                  <Text style={styles.topCenterCode}>{center.center_code}</Text>
+                  <View style={styles.topCenterStats}>
+                    <Text style={styles.topCenterAdmissions}>
+                      {center.total}
+                    </Text>
+                    <Text style={styles.topCenterLabel}>Admissions</Text>
+                  </View>
                 </View>
-              </View>
+              ))}
+          </View>
+        </View>
 
-              <View style={styles.systemItem}>
-                <Text style={styles.systemLabel}>Last Updated</Text>
-                <Text style={styles.systemValue}>
-                  {new Date().toLocaleDateString()}
+        {/* System Information */}
+        <View style={styles.systemInfo}>
+          <Text style={styles.sectionTitle}>System Information</Text>
+
+          <View style={styles.systemCard}>
+            <View style={styles.systemItem}>
+              <Text style={styles.systemLabel}>Status</Text>
+              <View style={styles.statusContainer}>
+                <View style={styles.statusDot} />
+                <Text style={styles.statusText}>
+                  {adminData?.status || "Active"}
                 </Text>
               </View>
+            </View>
 
-              <View style={[styles.systemItem, styles.systemItemLast]}>
-                <Text style={styles.systemLabel}>Security Status</Text>
-                <View style={styles.statusContainer}>
-                  <View
-                    style={[
-                      styles.statusDot,
-                      {
-                        backgroundColor: isScreenProtected
-                          ? "#4CAF50"
-                          : "#ffeb44",
-                      },
-                    ]}
-                  />
-                  <Text
-                    style={[
-                      styles.statusText,
-                      { color: isScreenProtected ? "#4CAF50" : "#ffb300" },
-                    ]}
-                  >
-                    {isScreenProtected ? "Protected" : "Unprotected"}
-                  </Text>
-                </View>
+            <View style={styles.systemItem}>
+              <Text style={styles.systemLabel}>Last Updated</Text>
+              <Text style={styles.systemValue}>
+                {new Date().toLocaleDateString()}
+              </Text>
+            </View>
+
+            <View style={styles.systemItem}>
+              <Text style={styles.systemLabel}>Security Status</Text>
+              <View style={styles.statusContainer}>
+                <View style={[styles.statusDot, { backgroundColor: isScreenProtected ? "#4CAF50" : "#ffeb44" }]} />
+                <Text style={[styles.statusText, { color: isScreenProtected ? "#4CAF50" : "#ffb300" }]}>
+                  {isScreenProtected ? "Protected" : "Unprotected"}
+                </Text>
               </View>
             </View>
           </View>
-        </ScrollView>
+        </View>
+      </ScrollView>
 
-        {/* Center Performance Modal */}
-        <CenterPerformanceModal
-          visible={showCenterModal}
-          onClose={() => setShowCenterModal(false)}
-          centers={dashboardData?.center_today_admission || []}
-        />
+      {/* Center Performance Modal */}
+      <CenterPerformanceModal
+        visible={showCenterModal}
+        onClose={() => setShowCenterModal(false)}
+        centers={dashboardData?.center_today_admission || []}
+      />
 
-        {/* Security Alert Modal */}
-        <SecurityAlert
-          visible={showSecurityAlert}
-          onClose={() => setShowSecurityAlert(false)}
-        />
-      </SafeAreaView>
-    </View>
+      {/* Security Alert Modal */}
+      <SecurityAlert
+        visible={showSecurityAlert}
+        onClose={() => setShowSecurityAlert(false)}
+      />
+    </SafeAreaView>
   );
 };
 
 export default AdminDashboard;
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    flex: 1,
-    backgroundColor: "#234785",
-  },
   container: {
     flex: 1,
     backgroundColor: "#f5f7fa",
@@ -860,20 +814,38 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f5f7fa",
-  },
-  loadingHeader: {
-    height: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-    backgroundColor: "#234785",
-  },
-  loadingHeaderGradient: {
-    flex: 1,
   },
   loadingText: {
     marginTop: 10,
     fontSize: responsiveSize(16),
     color: "#234785",
     fontWeight: "600",
+  },
+  
+  // Security Indicator Styles
+  securityIndicator: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    backgroundColor: "rgba(255, 235, 68, 0.9)",
+    borderRadius: 15,
+    position: "absolute",
+    top: Platform.OS === "ios" ? 50 : 10,
+    right: 20,
+    zIndex: 1000,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  securityText: {
+    fontSize: 12,
+    fontWeight: "600",
+    marginLeft: 5,
+    color: "#234785",
   },
 
   // Security Alert Styles
@@ -926,7 +898,7 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 10,
+    paddingTop: 10,
     paddingBottom: responsiveSize(20),
     paddingHorizontal: responsiveSize(20),
     minHeight: responsiveSize(100),
@@ -1455,9 +1427,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#ecf0f1",
   },
-  systemItemLast: {
-    borderBottomWidth: 0,
-  },
   systemLabel: {
     fontSize: responsiveSize(14),
     color: "#7f8c8d",
@@ -1487,5 +1456,5 @@ const styles = StyleSheet.create({
     fontSize: responsiveSize(14),
     color: "#27ae60",
     fontWeight: "600",
-  },
+  },  
 });

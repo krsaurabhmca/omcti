@@ -11,7 +11,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -208,82 +208,70 @@ const WalletStatementScreen = ({ route, navigation }) => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainerWrapper}>
-        <StatusBar barStyle="light-content" backgroundColor="#234785" translucent={false} />
-        <SafeAreaView style={styles.loadingContainer} edges={['bottom']}>
-          <ActivityIndicator size="large" color="#234785" />
-          <Text style={styles.loadingText}>Loading wallet statement...</Text>
-        </SafeAreaView>
-      </View>
+      <SafeAreaView style={styles.loadingContainer}>
+        <StatusBar barStyle="light-content" backgroundColor="#234785" />
+        <ActivityIndicator size="large" color="#234785" />
+        <Text style={styles.loadingText}>Loading wallet statement...</Text>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#234785" translucent={false} />
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#234785" />
       
       {/* Header */}
       <LinearGradient
         colors={['#234785', '#3d6aa5']}
-        style={styles.headerGradient}
+        style={styles.header}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
       >
-        <SafeAreaView edges={['top']} style={styles.headerSafeArea}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={24} color="#ffeb44" />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Wallet Statement</Text>
-            <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
-              <Ionicons name="refresh" size={24} color="#ffeb44" />
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#ffeb44" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Wallet Statement</Text>
+        <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
+          <Ionicons name="refresh" size={24} color="#ffeb44" />
+        </TouchableOpacity>
       </LinearGradient>
 
-      <SafeAreaView style={styles.contentContainer} edges={['bottom']}>
-        {/* Summary Card */}
-        {renderSummaryCard()}
+      {/* Summary Card */}
+      {renderSummaryCard()}
 
-        {/* Transaction List */}
-        <FlatList
-          data={getCurrentPageData()}
-          renderItem={renderTransactionItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={['#234785']}
-              tintColor="#234785"
-            />
-          }
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Ionicons name="document-text-outline" size={64} color="#ccc" />
-              <Text style={styles.emptyText}>No transactions found</Text>
-            </View>
-          }
-        />
+      {/* Transaction List */}
+      <FlatList
+        data={getCurrentPageData()}
+        renderItem={renderTransactionItem}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#234785']}
+            tintColor="#234785"
+          />
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Ionicons name="document-text-outline" size={64} color="#ccc" />
+            <Text style={styles.emptyText}>No transactions found</Text>
+          </View>
+        }
+      />
 
-        {/* Pagination */}
-        {statements.length > 0 && renderPagination()}
-      </SafeAreaView>
-    </View>
+      {/* Pagination */}
+      {statements.length > 0 && renderPagination()}
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#234785',
-  },
-  loadingContainerWrapper: {
-    flex: 1,
-    backgroundColor: '#234785',
+    backgroundColor: '#F8F9FA',
   },
   loadingContainer: {
     flex: 1,
@@ -296,18 +284,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
   },
-  headerGradient: {
-    paddingBottom: 0,
-  },
-  headerSafeArea: {
-    backgroundColor: 'transparent',
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
+    shadowColor: '#234785',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
   backButton: {
     padding: 8,
@@ -323,10 +310,6 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: 'rgba(255, 235, 68, 0.15)',
     borderRadius: 20,
-  },
-  contentContainer: {
-    flex: 1,
-    backgroundColor: '#F8F9FA',
   },
   summaryCard: {
     margin: 16,

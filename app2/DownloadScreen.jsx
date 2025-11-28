@@ -42,16 +42,16 @@ const DownloadScreen = () => {
       title: "Certificate",
       description: "Official completion certificate",
       icon: "ribbon",
-      color: "#10B981",
-      bgColor: "#E8F8F0",
+      color: "#3a5fa0",
+      bgColor: "#FFFEF5",
     },
     {
       id: "ac",
       title: "Admit Card",
       description: "Examination admit card with details",
       icon: "card",
-      color: "#3d6aa5",
-      bgColor: "#FFF9E6",
+      color: "#234785",
+      bgColor: "#E8F0F8",
     },
   ];
 
@@ -170,8 +170,8 @@ const DownloadScreen = () => {
     }
   };
 
-  // Open in WebView
-  const openInWebView = (item) => {
+  // Open in browser / PDF screen
+  const openInBrowser = (item) => {
     const url = downloads[item.id];
 
     if (!url) {
@@ -181,18 +181,12 @@ const DownloadScreen = () => {
 
     try {
       router.push({
-        pathname: "WebViewScreen",
-        params: {
-          url: url,
-          title: item.title,
-          bookTitle: `Student ${studentId}`,
-          from_page: 1,
-          to_page: 1
-        },
+        pathname: "PdfViewer",
+        params: { url, title: "Document" },
       });
     } catch (error) {
-      console.error("OpenInWebView error:", error);
-      Alert.alert("Error", "Failed to open document");
+      console.error("OpenInBrowser error:", error);
+      Alert.alert("Error", "Failed to open link");
     }
   };
 
@@ -225,7 +219,7 @@ const DownloadScreen = () => {
         <View style={styles.actionButtons}>
           {hasLink ? (
             <>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={[styles.actionButton, styles.downloadButton]}
                 onPress={() => downloadFile(item)}
                 disabled={isDownloading}
@@ -235,14 +229,14 @@ const DownloadScreen = () => {
                 ) : (
                   <Ionicons name="download" size={20} color="#234785" />
                 )}
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               
               <TouchableOpacity
                 style={[styles.actionButton, styles.viewButton]}
-                onPress={() => openInWebView(item)}
+                onPress={() => openInBrowser(item)}
                 disabled={isDownloading}
               >
-                <Ionicons name="eye" size={20} color="#ffeb44" />
+                <Ionicons name="eye" size={20} color="#fff" />
               </TouchableOpacity>
             </>
           ) : (
@@ -258,8 +252,8 @@ const DownloadScreen = () => {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#234785" translucent={false} />
-        <LinearGradient colors={["#234785", "#3d6aa5"]} style={styles.loadingContainer}>
+        <StatusBar barStyle="light-content" backgroundColor="#234785" />
+        <LinearGradient colors={["#234785", "#1a3666"]} style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#ffeb44" />
           <Text style={styles.loadingText}>Loading Downloads...</Text>
         </LinearGradient>
@@ -269,10 +263,10 @@ const DownloadScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#234785" translucent={false} />
+      <StatusBar barStyle="light-content" backgroundColor="#234785" />
       
       {/* Header */}
-      <LinearGradient colors={["#234785", "#3d6aa5"]} style={styles.header}>
+      <LinearGradient colors={["#234785", "#1a3666"]} style={styles.header}>
         <View style={styles.headerContent}>
           <View style={styles.headerLeft}>
             <TouchableOpacity style={styles.backButton} onPress={router.back}>
@@ -298,7 +292,7 @@ const DownloadScreen = () => {
           </View>
           <Text style={styles.infoDescription}>
             Download your official documents. Tap the download button to save files locally, 
-            or use the view button to open in viewer.
+            or use the view button to open in browser.
           </Text>
         </View>
 
@@ -319,7 +313,7 @@ const DownloadScreen = () => {
           <View style={styles.helpItem}>
             <Ionicons name="eye-outline" size={20} color="#234785" />
             <Text style={styles.helpText}>
-              Tap view to open the document in viewer
+              Tap view to open the document in your browser
             </Text>
           </View>
           <View style={styles.helpItem}>
@@ -336,7 +330,7 @@ const DownloadScreen = () => {
             Documents are generated in PDF format
           </Text>
           <Text style={styles.footerSubtext}>
-            © 2025 OMCTI Education. All rights reserved.
+            © 2025 ICA Education. All rights reserved.
           </Text>
         </View>
       </ScrollView>
@@ -369,9 +363,9 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     paddingHorizontal: 20,
     elevation: 4,
-    shadowColor: "#234785",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
   },
   headerContent: {
@@ -386,9 +380,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     marginRight: 16,
-    padding: 8,
-    backgroundColor: "rgba(255, 235, 68, 0.2)",
-    borderRadius: 20,
+    padding: 4,
   },
   headerTextContainer: {
     flex: 1,
@@ -426,8 +418,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    borderTopWidth: 3,
-    borderTopColor: "#ffeb44",
+    borderLeftWidth: 4,
+    borderLeftColor: "#ffeb44",
   },
   infoHeader: {
     flexDirection: "row",
@@ -518,6 +510,7 @@ const styles = StyleSheet.create({
   // Action Buttons
   actionButtons: {
     flexDirection: "row",
+    gap: 8,
   },
   actionButton: {
     width: 44,
@@ -525,7 +518,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 8,
   },
   downloadButton: {
     backgroundColor: "#ffeb44",
@@ -552,8 +544,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    borderTopWidth: 3,
-    borderTopColor: "#ffeb44",
+    borderWidth: 2,
+    borderColor: "#234785",
   },
   helpTitle: {
     fontSize: 18,

@@ -26,7 +26,6 @@ export default function RechargeScreen() {
   const [showPicker, setShowPicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [amountError, setAmountError] = useState("");
-  const [remark, setRemark] = useState("");
 
   const validateAmount = (value) => {
     const numValue = parseInt(value);
@@ -97,7 +96,6 @@ export default function RechargeScreen() {
         center_id: center_id,
         credit_amt: amount,
         txn_date: date.toISOString().split("T")[0],
-        txn_remarks: remark.trim() || "Recharge via App",
       };
 
       const response = await fetch(
@@ -168,7 +166,7 @@ export default function RechargeScreen() {
               <Text style={styles.infoLabel}>Code</Text>
               <Text style={styles.infoValue}>{center_code}</Text>
             </View>
-            <View style={[styles.infoRow, styles.infoRowSpacing]}>
+            <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Name</Text>
               <Text style={styles.infoValue}>{center_name}</Text>
             </View>
@@ -235,26 +233,6 @@ export default function RechargeScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Remark Input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Remark (Optional)</Text>
-            <View style={styles.remarkInputWrapper}>
-              <Ionicons name="create-outline" size={20} color="#234785" style={styles.remarkIcon} />
-              <TextInput
-                style={styles.remarkInput}
-                value={remark}
-                placeholder="Enter transaction remark"
-                placeholderTextColor="#adb5bd"
-                onChangeText={setRemark}
-                maxLength={100}
-                multiline
-                numberOfLines={2}
-                textAlignVertical="top"
-              />
-            </View>
-            <Text style={styles.characterCount}>{remark.length}/100</Text>
-          </View>
-
           {showPicker && (
             <DateTimePicker
               value={date}
@@ -280,12 +258,6 @@ export default function RechargeScreen() {
             <Text style={styles.summaryLabel}>Transaction Date</Text>
             <Text style={styles.summaryValue}>{formatDate(date)}</Text>
           </View>
-          {remark ? (
-            <View style={styles.summaryRowColumn}>
-              <Text style={styles.summaryLabel}>Remark</Text>
-              <Text style={styles.summaryRemark}>{remark}</Text>
-            </View>
-          ) : null}
         </View>
 
         {/* Action Button */}
@@ -371,7 +343,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   centerInfo: {
-    marginTop: 4,
+    gap: 12,
   },
   infoRow: {
     flexDirection: "row",
@@ -383,9 +355,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#ffeb44",
-  },
-  infoRowSpacing: {
-    marginTop: 12,
   },
   infoLabel: {
     fontSize: 14,
@@ -430,7 +399,7 @@ const styles = StyleSheet.create({
   quickAmountGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginHorizontal: -4,
+    gap: 8,
   },
   quickAmountButton: {
     backgroundColor: "#f8f9fa",
@@ -441,7 +410,6 @@ const styles = StyleSheet.create({
     borderColor: "#e9ecef",
     minWidth: 80,
     alignItems: "center",
-    margin: 4,
   },
   quickAmountButtonActive: {
     backgroundColor: "#ffeb44",
@@ -518,34 +486,6 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     fontWeight: "500",
   },
-  remarkInputWrapper: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    borderWidth: 2,
-    borderColor: "#e9ecef",
-    borderRadius: 12,
-    backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  remarkIcon: {
-    marginTop: 2,
-    marginRight: 8,
-  },
-  remarkInput: {
-    flex: 1,
-    fontSize: 16,
-    color: "#234785",
-    minHeight: 60,
-    paddingTop: 0,
-  },
-  characterCount: {
-    fontSize: 12,
-    color: "#adb5bd",
-    textAlign: "right",
-    marginTop: 4,
-    marginRight: 4,
-  },
   summaryCard: {
     backgroundColor: "#fff9e6",
     borderRadius: 16,
@@ -565,9 +505,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 8,
   },
-  summaryRowColumn: {
-    marginTop: 4,
-  },
   summaryLabel: {
     fontSize: 14,
     color: "#666",
@@ -583,13 +520,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#234785",
   },
-  summaryRemark: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#234785",
-    marginTop: 4,
-    fontStyle: "italic",
-  },
   rechargeButton: {
     backgroundColor: "#ffeb44",
     borderRadius: 16,
@@ -598,6 +528,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 8,
     shadowColor: "#234785",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -613,7 +544,6 @@ const styles = StyleSheet.create({
     color: "#234785",
     fontSize: 16,
     fontWeight: "700",
-    marginLeft: 8,
   },
   loadingContainer: {
     flexDirection: "row",

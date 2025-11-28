@@ -252,21 +252,21 @@ const AccountEntryScreen = () => {
     >
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
-          <StatusBar barStyle="light-content" backgroundColor="#234785" translucent={false} />
+          <StatusBar barStyle="light-content" backgroundColor="#4F46E5" />
           
           {/* Header */}
           <LinearGradient 
-            colors={['#234785', '#3d6aa5']}  
+            colors={['#4F46E5', '#7C3AED']}  
             style={styles.header}
           >
             <TouchableOpacity 
               style={styles.backButton} 
               onPress={() => {
                 Keyboard.dismiss();
-                router.back();
+                navigation.goBack();
               }}
             >
-              <Ionicons name="arrow-back" size={24} color="#ffeb44" />
+              <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Account Entry</Text>
             <View style={styles.headerRight} />
@@ -307,7 +307,7 @@ const AccountEntryScreen = () => {
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Transaction Date</Text>
                 <TouchableOpacity style={styles.dateButton} onPress={showDatePickerModal}>
-                  <Ionicons name="calendar-outline" size={20} color="#234785" style={styles.dateIcon} />
+                  <Ionicons name="calendar-outline" size={20} color="#666" style={styles.dateIcon} />
                   <Text style={styles.dateButtonText}>
                     {formData.txn_date ? new Date(formData.txn_date).toLocaleDateString() : 'Select Date'}
                   </Text>
@@ -326,7 +326,7 @@ const AccountEntryScreen = () => {
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Transaction Amount</Text>
                 <View style={styles.inputContainer}>
-                  <Ionicons name="cash-outline" size={20} color="#234785" style={styles.inputIcon} />
+                  <Ionicons name="cash-outline" size={20} color="#666" style={styles.inputIcon} />
                   <TextInput
                     style={styles.input}
                     value={formData.txn_amount}
@@ -369,8 +369,8 @@ const AccountEntryScreen = () => {
               {/* Remarks */}
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Remarks</Text>
-                <View style={[styles.inputContainer, styles.remarksContainer]}>
-                  <Ionicons name="document-text-outline" size={20} color="#234785" style={styles.inputIcon} />
+                <View style={styles.inputContainer}>
+                  <Ionicons name="document-text-outline" size={20} color="#666" style={styles.inputIcon} />
                   <TextInput
                     style={[styles.input, styles.remarksInput]}
                     value={formData.txn_remarks}
@@ -389,20 +389,25 @@ const AccountEntryScreen = () => {
               </View>
 
               {/* Submit Button */}
-              <TouchableOpacity
+              <LinearGradient
+                colors={['#4F46E5', '#7C3AED']}
                 style={[styles.submitButton, loading && styles.disabledButton]}
-                onPress={submitForm}
-                disabled={loading}
               >
-                {loading ? (
-                  <ActivityIndicator color="#234785" size="small" />
-                ) : (
-                  <View style={styles.submitButtonContent}>
-                    <Ionicons name="checkmark-circle-outline" size={20} color="#234785" style={styles.submitIcon} />
-                    <Text style={styles.submitButtonText}>Submit Entry</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.submitButtonInner}
+                  onPress={submitForm}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <View style={styles.submitButtonContent}>
+                      <Ionicons name="checkmark-circle-outline" size={20} color="#fff" style={styles.submitIcon} />
+                      <Text style={styles.submitButtonText}>Submit Entry</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </LinearGradient>
             </View>
             
             {/* Extra padding when keyboard is visible */}
@@ -423,11 +428,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 40,
+    backgroundColor: '#4c669f',
+    paddingTop: 20,
     paddingBottom: 15,
     paddingHorizontal: 20,
     elevation: 8,
-    shadowColor: '#234785',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 4,
@@ -438,12 +444,12 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 235, 68, 0.2)',
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#ffeb44',
+    color: '#fff',
     flex: 1,
     textAlign: 'center',
     marginHorizontal: 10,
@@ -470,8 +476,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.15,
     shadowRadius: 8,
-    borderTopWidth: 3,
-    borderTopColor: '#ffeb44',
   },
   formGroup: {
     marginBottom: 25,
@@ -480,14 +484,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 10,
-    color: '#234785',
+    color: '#2c3e50',
     letterSpacing: 0.5,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderWidth: 1.5,
+    borderColor: '#e1e8ed',
     borderRadius: 12,
     backgroundColor: '#fafbfc',
     paddingHorizontal: 15,
@@ -501,17 +505,12 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 1,
   },
-  remarksContainer: {
-    alignItems: 'flex-start',
-    paddingVertical: 8,
-  },
   input: {
     flex: 1,
     fontSize: 16,
-    color: '#234785',
+    color: '#2c3e50',
     paddingVertical: 12,
     marginLeft: 10,
-    fontWeight: '500',
   },
   inputIcon: {
     marginRight: 5,
@@ -522,8 +521,8 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
   pickerContainer: {
-    borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderWidth: 1.5,
+    borderColor: '#e1e8ed',
     borderRadius: 12,
     backgroundColor: '#fafbfc',
     shadowColor: '#000',
@@ -534,17 +533,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
-    overflow: 'hidden',
   },
   picker: {
     height: 52,
-    color: '#234785',
+    color: '#2c3e50',
   },
   dateButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderWidth: 1.5,
+    borderColor: '#e1e8ed',
     borderRadius: 12,
     padding: 15,
     backgroundColor: '#fafbfc',
@@ -562,33 +560,33 @@ const styles = StyleSheet.create({
   },
   dateButtonText: {
     fontSize: 16,
-    color: '#234785',
+    color: '#2c3e50',
     flex: 1,
-    fontWeight: '500',
   },
   submitButton: {
-    backgroundColor: '#ffeb44',
+    backgroundColor: '#4c669f',
     padding: 18,
     borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 15,
     elevation: 5,
-    shadowColor: '#234785',
+    shadowColor: '#4c669f',
     shadowOffset: {
       width: 0,
       height: 4,
     },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    borderWidth: 2,
-    borderColor: '#ffeb44',
   },
   disabledButton: {
-    backgroundColor: '#e5e7eb',
-    borderColor: '#e5e7eb',
-    shadowOpacity: 0,
-    elevation: 0,
+    backgroundColor: '#95a5a6',
+    shadowColor: '#95a5a6',
+  },
+  submitButtonInner: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   submitButtonContent: {
     flexDirection: 'row',
@@ -598,7 +596,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   submitButtonText: {
-    color: '#234785',
+    color: '#fff',
     fontSize: 18,
     fontWeight: '700',
     letterSpacing: 0.5,

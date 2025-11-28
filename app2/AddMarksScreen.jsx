@@ -9,7 +9,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TextInput,
@@ -271,8 +270,7 @@ const AddMarksScreen = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <StatusBar barStyle="light-content" backgroundColor="#234785" translucent={false} />
-        <ActivityIndicator size="large" color="#234785" />
+        <ActivityIndicator size="large" color="#a809baff" />
         <Text style={styles.loadingText}>Loading student data...</Text>
       </View>
     );
@@ -281,7 +279,6 @@ const AddMarksScreen = () => {
   if (!student_id || !student) {
     return (
       <View style={styles.errorContainer}>
-        <StatusBar barStyle="light-content" backgroundColor="#234785" translucent={false} />
         <Text style={styles.errorText}>No student data provided</Text>
         <TouchableOpacity style={styles.retryButton} onPress={() => router.push('/')}>
           <Text style={styles.retryButtonText}>Go Back</Text>
@@ -299,7 +296,6 @@ const AddMarksScreen = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
-      <StatusBar barStyle="light-content" backgroundColor="#234785" translucent={false} />
       <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -308,7 +304,7 @@ const AddMarksScreen = () => {
       >
       {/* Header with Gradient */}
       <LinearGradient
-        colors={["#234785", "#3d6aa5"]}
+        colors={["#a809baff", "#7809bcff"]}
         style={styles.headerGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -318,7 +314,7 @@ const AddMarksScreen = () => {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Ionicons name="arrow-back" size={24} color="#ffeb44" />
+            <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.title}>Marks Entry</Text>
           <View style={styles.headerSpacer} />
@@ -364,7 +360,6 @@ const AddMarksScreen = () => {
                   value={paper.marks_obtained ? paper.marks_obtained.toString() : ''}
                   onChangeText={(text) => updateMarks(index, text)}
                   placeholder="Enter marks"
-                  placeholderTextColor="#999"
                   keyboardType="numeric"
                   maxLength={3}
                   returnKeyType="next"
@@ -400,7 +395,7 @@ const AddMarksScreen = () => {
           disabled={submitting}
         >
           {submitting ? (
-            <ActivityIndicator color="#234785" />
+            <ActivityIndicator color="#fff" />
           ) : (
             <Text style={styles.submitButtonText}>Submit Marks</Text>
           )}
@@ -414,7 +409,7 @@ const AddMarksScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fc',
+    backgroundColor: '#f5f5f5',
   },
   scrollView: {
     flex: 1,
@@ -427,19 +422,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fc',
+    backgroundColor: '#f5f5f5',
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#234785',
-    fontWeight: '500',
+    color: '#666',
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fc',
+    backgroundColor: '#f5f5f5',
     padding: 20,
   },
   errorText: {
@@ -449,20 +443,20 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: '#ffeb44',
+    backgroundColor: '#a809baff',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
-    shadowColor: '#234785',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
   },
   retryButtonText: {
-    color: '#234785',
+    color: '#fff',
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '600',
+  },
+  header: {
+    backgroundColor: '#007AFF',
+    padding: 20,
+    paddingTop: 50,
   },
   headerGradient: {
     paddingTop: 40,
@@ -475,17 +469,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   backButton: {
-    padding: 8,
-    backgroundColor: 'rgba(255, 235, 68, 0.2)',
-    borderRadius: 20,
+    padding: 4,
   },
   headerSpacer: {
-    width: 40,
+    width: 32, // Same width as back button for centering
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#ffeb44',
+    color: '#fff',
     flex: 1,
     textAlign: 'center',
   },
@@ -500,8 +492,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    borderTopWidth: 3,
-    borderTopColor: '#ffeb44',
   },
   studentInfo: {
     flex: 1,
@@ -509,7 +499,7 @@ const styles = StyleSheet.create({
   studentName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#234785',
+    color: '#333',
     marginBottom: 5,
   },
   studentDetail: {
@@ -522,8 +512,6 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     backgroundColor: '#f0f0f0',
-    borderWidth: 2,
-    borderColor: '#ffeb44',
   },
   papersSection: {
     margin: 16,
@@ -531,7 +519,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#234785',
+    color: '#333',
     marginBottom: 12,
   },
   noPapersContainer: {
@@ -544,8 +532,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
-    borderWidth: 1,
-    borderColor: '#ffeb44',
   },
   noPapersText: {
     fontSize: 16,
@@ -562,13 +548,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
-    borderLeftWidth: 4,
-    borderLeftColor: '#ffeb44',
   },
   paperName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#234785',
+    color: '#333',
     marginBottom: 8,
   },
   paperDetails: {
@@ -587,23 +571,20 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 14,
-    color: '#234785',
+    color: '#333',
     marginRight: 12,
     minWidth: 100,
-    fontWeight: '600',
   },
   marksInput: {
     flex: 1,
-    borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
     fontSize: 16,
-    backgroundColor: '#fff9e6',
-    minHeight: 44,
-    color: '#234785',
-    fontWeight: '500',
+    backgroundColor: '#fafafa',
+    minHeight: 44, // Better touch target
   },
   resultsSection: {
     backgroundColor: '#fff',
@@ -615,8 +596,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    borderTopWidth: 3,
-    borderTopColor: '#ffeb44',
   },
   resultRow: {
     flexDirection: 'row',
@@ -626,44 +605,38 @@ const styles = StyleSheet.create({
   },
   resultLabel: {
     fontSize: 16,
-    color: '#234785',
-    fontWeight: '600',
+    color: '#333',
+    fontWeight: '500',
   },
   resultValue: {
     fontSize: 16,
-    color: '#234785',
+    color: '#a809baff',
     fontWeight: 'bold',
   },
   grade: {
     fontSize: 18,
-    backgroundColor: '#ffeb44',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 8,
   },
   submitButton: {
-    backgroundColor: '#ffeb44',
+    backgroundColor: '#28a745',
     marginHorizontal: 16,
     marginVertical: 20,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#234785',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 5,
-    marginBottom: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    marginBottom: 40, // Extra space for keyboard
   },
   submitButtonDisabled: {
-    backgroundColor: '#e5e7eb',
-    shadowOpacity: 0,
-    elevation: 0,
+    backgroundColor: '#95a5a6',
   },
   submitButtonText: {
-    color: '#234785',
+    color: '#fff',
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: 'bold',
   },
 });
 

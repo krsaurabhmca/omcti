@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
+
 import {
-  Alert,
   Image,
   Linking,
   SafeAreaView,
@@ -11,16 +12,48 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
+
+import {
+  Button,
+  Dialog,
+  Provider as PaperProvider,
+  Portal,
+  Snackbar
+} from 'react-native-paper';
 
 const PaymentDetailsScreen = () => {
   const router = useRouter();
+
+  // Paper States
+  const [snackVisible, setSnackVisible] = useState(false);
+  const [snackMessage, setSnackMessage] = useState("");
+
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState("");
+
+  // Show snackbar
+  const showSnack = (msg) => {
+    setSnackMessage(msg);
+    setSnackVisible(true);
+  };
+
+  // Show dialog
+  const showDialog = (msg) => {
+    setDialogMessage(msg);
+    setDialogVisible(true);
+  };
+
+  const openUPI = (url, errorMsg) => {
+    Linking.openURL(url).catch(() => showDialog(errorMsg));
+  };
+
   const handleUPIPayment = () => {
-    const upiUrl = 'upi://pay?pa=icaedu@sbi&pn=Immense Institute of Technology & Management';
-    Linking.openURL(upiUrl).catch(() => {
-      Alert.alert('Error', 'UPI app not found. Please install a UPI app to make payments.');
-    });
+    openUPI(
+      'upi://pay?pa=8510013001&pn=OMCTI Pvt. Ltd.',
+      'UPI app not found. Please install a UPI app to make payments.'
+    );
   };
 
   const handleWebPayment = () => {
@@ -28,171 +61,198 @@ const PaymentDetailsScreen = () => {
   };
 
   const handlePhonePePayment = () => {
-    const phonepeUrl = 'phonepe://pay?pa=icaedu@sbi';
-    Linking.openURL(phonepeUrl).catch(() => {
-      Alert.alert('Error', 'PhonePe app not found. Please install PhonePe to make payments.');
-    });
+    openUPI(
+      'phonepe://pay?pa=8510013001',
+      'PhonePe app not found. Please install PhonePe to make payments.'
+    );
   };
 
   const handleGooglePayPayment = () => {
-    const gpayUrl = 'tez://upi/pay?pa=icaedu@sbi';
-    Linking.openURL(gpayUrl).catch(() => {
-      Alert.alert('Error', 'Google Pay app not found. Please install Google Pay to make payments.');
-    });
+    openUPI(
+      'tez://upi/pay?pa=8510013001',
+      'Google Pay app not found. Please install Google Pay to make payments.'
+    );
   };
 
   const copyToClipboard = (text, label) => {
-    // In a real app, you'd use Clipboard from @react-native-clipboard/clipboard
-    Alert.alert('Copied!', `${label} copied to clipboard: ${text}`);
+    showSnack(`${label} copied: ${text}`);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#234785" />
-      
-      {/* Header */}
-      <LinearGradient
-        colors={['#234785', '#3d6aa5']}
-        style={styles.header}
-      >
-        <View style={styles.headerTop}>
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={() => router.back()}
-          >
-            <Ionicons name="arrow-back" size={24} color="#ffeb44" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Payment Gateway</Text>
-          <View style={styles.placeholder} />
-        </View>
-        <Text style={styles.headerSubtitle}>Pay in favor of</Text>
-        <Text style={styles.instituteName}>
-          Immense Institute of Technology{'\n'}& Management Pvt. Ltd.
-        </Text>
-      </LinearGradient>
+    <PaperProvider>
+      <SafeAreaView style={styles.container}>
+        
+        <StatusBar barStyle="light-content" backgroundColor="#234785" />
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Account Payment Section */}
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="card-outline" size={24} color="#234785" />
-            <Text style={styles.sectionTitle}>Account Payment</Text>
-          </View>
-          
-          <View style={styles.detailsCard}>
-            <View style={styles.detailRow}>
-              <Text style={styles.labelText}>Institute Name:</Text>
-              <Text style={styles.valueText}>Immense Institute of Technology & Management</Text>
-            </View>
-            
-            <View style={styles.detailRow}>
-              <Text style={styles.labelText}>IFSC Code:</Text>
-              <TouchableOpacity 
-                onPress={() => copyToClipboard('SBIN0005456', 'IFSC Code')}
-                style={styles.copyableText}
-              >
-                <Text style={styles.valueTextHighlight}>SBIN0005456</Text>
-                <Ionicons name="copy-outline" size={16} color="#234785" />
-              </TouchableOpacity>
-            </View>
-            
-            <View style={styles.detailRow}>
-              <Text style={styles.labelText}>Account Number:</Text>
-              <TouchableOpacity 
-                onPress={() => copyToClipboard('36953179486', 'Account Number')}
-                style={styles.copyableText}
-              >
-                <Text style={styles.valueTextHighlight}>36953179486</Text>
-                <Ionicons name="copy-outline" size={16} color="#234785" />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
-        {/* QR/UPI Payment Section */}
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="qr-code-outline" size={24} color="#234785" />
-            <Text style={styles.sectionTitle}>QR / UPI Payment</Text>
-          </View>
-          
-          <View style={styles.detailsCard}>
-            <View style={styles.detailRow}>
-              <Text style={styles.labelText}>UPI ID:</Text>
-              <TouchableOpacity 
-                onPress={() => copyToClipboard('icaedu@sbi', 'UPI ID')}
-                style={styles.copyableText}
-              >
-                <Text style={styles.valueTextHighlight}>icaedu@sbi</Text>
-                <Ionicons name="copy-outline" size={16} color="#234785" />
-              </TouchableOpacity>
-            </View>
-            
+        {/* Header */}
+        <LinearGradient
+          colors={['#234785', '#3d6aa5']}
+          style={styles.header}
+        >
+          <View style={styles.headerTop}>
             <TouchableOpacity 
-              style={styles.paymentButton}
-              onPress={handleUPIPayment}
+              style={styles.backButton} 
+              onPress={() => router.back()}
             >
-              <Ionicons name="flash" size={20} color="#234785" />
-              <Text style={styles.buttonText}>Pay with UPI</Text>
+              <Ionicons name="arrow-back" size={24} color="#ffeb44" />
             </TouchableOpacity>
+            <Text style={styles.headerTitle}>Payment Gateway</Text>
+            <View style={styles.placeholder} />
           </View>
-        </View>
 
-        {/* Mobile Payment Section */}
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="phone-portrait-outline" size={24} color="#234785" />
-            <Text style={styles.sectionTitle}>Mobile Payment</Text>
+          <Text style={styles.headerSubtitle}>Pay in favor of</Text>
+          <Text style={styles.instituteName}>OMCTI Pvt. Ltd.</Text>
+        </LinearGradient>
+
+        {/* Content */}
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          
+          {/* Account Payment Section */}
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="card-outline" size={24} color="#234785" />
+              <Text style={styles.sectionTitle}>Account Payment</Text>
+            </View>
+
+            <View style={styles.detailsCard}>
+              <View style={styles.detailRow}>
+                <Text style={styles.labelText}>Institute Name:</Text>
+                <Text style={styles.valueText}>OMCTI Pvt. Ltd.</Text>
+              </View>
+
+              <View style={styles.detailRow}>
+                <Text style={styles.labelText}>IFSC Code:</Text>
+                <TouchableOpacity 
+                  onPress={() => copyToClipboard('HDFC000329', 'IFSC Code')}
+                  style={styles.copyableText}
+                >
+                  <Text style={styles.valueTextHighlight}>HDFC000329</Text>
+                  <Ionicons name="copy-outline" size={16} color="#234785" />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.detailRow}>
+                <Text style={styles.labelText}>Account Number:</Text>
+                <TouchableOpacity 
+                  onPress={() => copyToClipboard('50200096307590', 'Account Number')}
+                  style={styles.copyableText}
+                >
+                  <Text style={styles.valueTextHighlight}>50200096307590</Text>
+                  <Ionicons name="copy-outline" size={16} color="#234785" />
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
           
-          <View style={styles.detailsCard}>
-            <Text style={styles.mobilePaymentTitle}>Pay with PhonePe & Google Pay</Text>
-            
-            <View style={styles.mobileNumberContainer}>
-              <Text style={styles.labelText}>Mobile Numbers:</Text>
-              <TouchableOpacity 
-                onPress={() => copyToClipboard('8271055515', 'Mobile Number')}
-                style={styles.copyableText}
-              >
-                <Text style={styles.valueTextHighlight}>8271055515</Text>
-                <Ionicons name="copy-outline" size={16} color="#234785" />
-              </TouchableOpacity>
+          {/* QR / UPI Payment Section */}
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="qr-code-outline" size={24} color="#234785" />
+              <Text style={styles.sectionTitle}>QR / UPI Payment</Text>
             </View>
-            
-            <View style={styles.mobileButtonsContainer}>
-              <TouchableOpacity 
-                style={styles.mobilePaymentButton}
-                onPress={handlePhonePePayment}
-              >
-                <Text style={styles.buttonText}>PhonePe</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.mobilePaymentButton}
-                onPress={handleGooglePayPayment}
-              >
-                <Text style={styles.buttonText}>Google Pay</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
 
-        {/* QR Code Placeholder */}
-        <View style={styles.qrContainer}>
-          <View style={styles.qrPlaceholder}>
-           <Image
-              source={{ uri: 'https://omcti.in/apprise/assets/images/icaedu.png' }}
-              style={styles.qrImage}
-              resizeMode="contain"
-            />
-            <Text style={styles.scanPayText}>SCAN & PAY</Text>
+            <View style={styles.detailsCard}>
+              <View style={styles.detailRow}>
+                <Text style={styles.labelText}>UPI ID:</Text>
+                <TouchableOpacity 
+                  onPress={() => copyToClipboard('8510013001', 'UPI ID')}
+                  style={styles.copyableText}
+                >
+                  <Text style={styles.valueTextHighlight}>8510013001</Text>
+                  <Ionicons name="copy-outline" size={16} color="#234785" />
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity 
+                style={styles.paymentButton}
+                onPress={handleUPIPayment}
+              >
+                <Ionicons name="flash" size={20} color="#234785" />
+                <Text style={styles.buttonText}>Pay with UPI</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <Text style={styles.qrNote}>
-            Scan this QR code with any UPI app to make payment
-          </Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+
+          {/* Mobile Payment Section */}
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <Ionicons name="phone-portrait-outline" size={24} color="#234785" />
+              <Text style={styles.sectionTitle}>Mobile Payment</Text>
+            </View>
+
+            <View style={styles.detailsCard}>
+              <Text style={styles.mobilePaymentTitle}>Pay with PhonePe & Google Pay</Text>
+
+              <View style={styles.mobileNumberContainer}>
+                <Text style={styles.labelText}>Mobile Numbers:</Text>
+                <TouchableOpacity 
+                  onPress={() => copyToClipboard('8510013001', 'Mobile Number')}
+                  style={styles.copyableText}
+                >
+                  <Text style={styles.valueTextHighlight}>8510013001</Text>
+                  <Ionicons name="copy-outline" size={16} color="#234785" />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.mobileButtonsContainer}>
+                <TouchableOpacity 
+                  style={styles.mobilePaymentButton}
+                  onPress={handlePhonePePayment}
+                >
+                  <Text style={styles.buttonText}>PhonePe</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={[styles.mobilePaymentButton, styles.mobilePaymentButtonSpacing]}
+                  onPress={handleGooglePayPayment}
+                >
+                  <Text style={styles.buttonText}>Google Pay</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+
+          {/* QR Code Section */}
+          <View style={styles.qrContainer}>
+            <View style={styles.qrPlaceholder}>
+              <Image
+                source={{ uri: 'https://omcti.in/assets/img/qr.png' }}
+                style={styles.qrImage}
+                resizeMode="contain"
+              />
+              <Text style={styles.scanPayText}>SCAN & PAY</Text>
+            </View>
+            <Text style={styles.qrNote}>
+              Scan this QR code with any UPI app to make payment
+            </Text>
+          </View>
+
+        </ScrollView>
+
+        {/* Paper Snackbar */}
+        <Snackbar
+          visible={snackVisible}
+          onDismiss={() => setSnackVisible(false)}
+          duration={1500}
+          style={styles.snackbar}
+        >
+          {snackMessage}
+        </Snackbar>
+
+        {/* Error Dialog */}
+        <Portal>
+          <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
+            <Dialog.Title>Error</Dialog.Title>
+            <Dialog.Content>
+              <Text>{dialogMessage}</Text>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={() => setDialogVisible(false)}>OK</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+      </SafeAreaView>
+    </PaperProvider>
   );
 };
 
@@ -220,7 +280,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 235, 68, 0.2)',
   },
   placeholder: {
-    width: 40, // Same width as back button for centering
+    width: 40,
   },
   qrImage: {
     width: 150,
@@ -303,7 +363,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#fff9e6',
     padding: 12,
-    marginBottom: 5,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ffeb44',
@@ -337,38 +396,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginLeft: 8,
   },
-  webPaymentContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  orText: {
-    fontSize: 16,
-    color: '#6b7280',
-    fontWeight: '600',
-    marginBottom: 15,
-  },
-  webButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#234785',
-    marginBottom: 8,
-  },
-  webButtonText: {
-    color: '#234785',
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  subText: {
-    fontSize: 14,
-    color: '#6b7280',
-    fontStyle: 'italic',
-  },
   mobilePaymentTitle: {
     fontSize: 16,
     fontWeight: '600',
@@ -382,7 +409,6 @@ const styles = StyleSheet.create({
   mobileButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 15,
   },
   mobilePaymentButton: {
     flex: 1,
@@ -398,6 +424,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 3,
     elevation: 4,
+  },
+  mobilePaymentButtonSpacing: {
+    marginLeft: 15,
   },
   qrContainer: {
     alignItems: 'center',
@@ -434,6 +463,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 20,
     lineHeight: 20,
+  },
+  snackbar: {
+    backgroundColor: '#234785',
   },
 });
 

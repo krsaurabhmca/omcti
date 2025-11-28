@@ -190,14 +190,14 @@ useEffect(() => {
       color: '#234785',
       gradient: ['#1a3666', '#234785'],
     },
-    // {
-    //   id: 9,
-    //   title: 'Transactions',
-    //   icon: 'cash-outline',
-    //   iconType: 'Ionicons',
-    //   color: '#ffeb44',
-    //   gradient: ['#5b8dd8', '#ffeb44'],
-    // },
+    {
+      id: 9,
+      title: 'Transactions',
+      icon: 'cash-outline',
+      iconType: 'Ionicons',
+      color: '#ffeb44',
+      gradient: ['#5b8dd8', '#ffeb44'],
+    },
   ];
 
   const getIcon = (iconName, iconType, size = 24, color = '#fff') => {

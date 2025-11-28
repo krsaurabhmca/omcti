@@ -24,7 +24,7 @@ import {
 
 const AddStudentScreen = () => {
   const router = useRouter();
-  const { center_id } = useLocalSearchParams();
+  const { center_id } = useLocalSearchParams(); // Get center_id from route params
   
   const [formData, setFormData] = useState({
     student_name: '',
@@ -41,7 +41,7 @@ const AddStudentScreen = () => {
     student_id_proof: '',
     student_qualification: 'Matric',
     student_bloodgroup: 'Matric',
-    center_id: center_id || '',
+    center_id: center_id || '', // Use center_id from params
     course_id: '',
     student_roll: '',
     status: 'PENDING',
@@ -65,11 +65,12 @@ const AddStudentScreen = () => {
   const [courseSearch, setCourseSearch] = useState('');
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [tempCourseSearch, setTempCourseSearch] = useState('');
-  const [lastRoll, setLastRoll] = useState('');
+  const [lastRoll, setLastRoll] = useState(''); // New state for last_roll
 
   const genders = ['MALE', 'FEMALE', 'OTHERS'];
   const statusOptions = ['PENDING'];
 
+  // Fetch last roll number from API
   const fetchLastRoll = async () => {
     try {
       const response = await fetch('https://omcti.in/apprise/api.php?task=lastroll', {
@@ -92,6 +93,7 @@ const AddStudentScreen = () => {
     }
   };
 
+  // Fetch courses from API
   const fetchCourses = async () => {
     try {
       setLoadingCourses(true);
@@ -111,16 +113,19 @@ const AddStudentScreen = () => {
     }
   };
 
+  // Load data on component mount
   useEffect(() => {
     fetchCourses();
-    fetchLastRoll();
+    fetchLastRoll(); // Fetch last roll when component mounts
   }, []);
 
+  // Filter courses based on search
   const filteredCourses = courses.filter(course =>
     course.course_name?.toLowerCase().includes(tempCourseSearch.toLowerCase()) ||
     course.course_code?.toLowerCase().includes(tempCourseSearch.toLowerCase())
   );
 
+  // Handle course selection
   const handleCourseSelect = (course) => {
     setFormData(prev => ({ ...prev, course_id: course.id }));
     setCourseSearch(`${course.course_code} (${course.course_name})`);
@@ -128,10 +133,12 @@ const AddStudentScreen = () => {
     setTempCourseSearch('');
   };
 
+  // Generate 5-digit random prefix
   const generateRandomPrefix = () => {
     return Math.floor(10000 + Math.random() * 90000).toString();
   };
 
+  // Handle input changes
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
@@ -139,6 +146,7 @@ const AddStudentScreen = () => {
     }));
   };
 
+  // Handle date changes
   const handleDateChange = (event, selectedDate, type) => {
     if (Platform.OS === 'android') {
       setShowDatePicker(prev => ({ ...prev, [type]: false }));
@@ -153,10 +161,12 @@ const AddStudentScreen = () => {
     }
   };
 
+  // Format date for display
   const formatDate = (date) => {
     return date.toLocaleDateString('en-GB');
   };
 
+  // Upload image to server
   const uploadImage = async (asset, imageType) => {
     if (!asset) {
       Alert.alert('Error', 'No image selected');
@@ -211,6 +221,7 @@ const AddStudentScreen = () => {
     }
   };
 
+  // Pick image from gallery or camera
   const pickImage = async (imageType) => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -241,6 +252,7 @@ const AddStudentScreen = () => {
     }
   };
 
+  // Validate form data
   const validateForm = () => {
     const requiredFields = [
       'student_name',
@@ -281,6 +293,7 @@ const AddStudentScreen = () => {
     return true;
   };
 
+  // Submit form data
   const submitForm = async () => {
     if (!validateForm()) return;
 
@@ -329,10 +342,10 @@ const AddStudentScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#234785" />
+      <StatusBar barStyle="light-content" backgroundColor="#667eea" />
       
       <LinearGradient
-        colors={['#234785', '#3d6aa5']}
+        colors={['#667eea', '#764ba2']}
         style={styles.header}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
@@ -341,7 +354,7 @@ const AddStudentScreen = () => {
           style={styles.backButton} 
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#ffeb44" />
+          <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Add New Student</Text>
         <View style={styles.headerSpacer} />
@@ -391,7 +404,7 @@ const AddStudentScreen = () => {
               onPress={() => setShowDatePicker(prev => ({ ...prev, birth: true }))}
             >
               <Text style={styles.dateText}>{formatDate(formData.date_of_birth)}</Text>
-              <Ionicons name="calendar-outline" size={20} color="#234785" />
+              <Ionicons name="calendar-outline" size={20} color="#666" />
             </TouchableOpacity>
             {showDatePicker.birth && (
               <DateTimePicker
@@ -482,7 +495,7 @@ const AddStudentScreen = () => {
             <Text style={styles.label}>Course *</Text>
             {loadingCourses ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color="#234785" />
+                <ActivityIndicator size="small" color="#007bff" />
                 <Text style={styles.loadingText}>Loading courses...</Text>
               </View>
             ) : (
@@ -496,7 +509,7 @@ const AddStudentScreen = () => {
                 <Text style={[styles.selectButtonText, !courseSearch && styles.placeholderText]}>
                   {courseSearch || 'Select Course'}
                 </Text>
-                <Ionicons name="chevron-down" size={20} color="#234785" />
+                <Ionicons name="chevron-down" size={20} color="#666" />
               </TouchableOpacity>
             )}
           </View>
@@ -514,7 +527,7 @@ const AddStudentScreen = () => {
               />
             </View>
 
-            <View style={[styles.inputContainer, styles.halfWidth, styles.halfWidthSpacing]}>
+            <View style={[styles.inputContainer, styles.halfWidth]}>
               <View style={styles.labelContainer}>
                 <Text style={styles.label}>Reg. No. *</Text>
                 {lastRoll ? (
@@ -546,14 +559,14 @@ const AddStudentScreen = () => {
             >
               {uploadingImages.student_photo ? (
                 <View style={styles.imageButtonContent}>
-                  <ActivityIndicator size="large" color="#234785" />
+                  <ActivityIndicator size="large" color="#007bff" />
                   <Text style={styles.imageButtonText}>Uploading...</Text>
                 </View>
               ) : selectedImages.student_photo ? (
                 <Image source={{ uri: selectedImages.student_photo.uri }} style={styles.imagePreview} />
               ) : (
                 <View style={styles.imageButtonContent}>
-                  <Ionicons name="camera-outline" size={32} color="#234785" />
+                  <Ionicons name="camera-outline" size={32} color="#666" />
                   <Text style={styles.imageButtonText}>Upload Photo</Text>
                   <Text style={styles.imageButtonSubText}>Tap to select image</Text>
                 </View>
@@ -571,21 +584,21 @@ const AddStudentScreen = () => {
               >
                 {uploadingImages.student_edu_proof ? (
                   <View style={styles.imageButtonContent}>
-                    <ActivityIndicator size="small" color="#234785" />
+                    <ActivityIndicator size="small" color="#007bff" />
                     <Text style={styles.imageButtonTextSmall}>Uploading...</Text>
                   </View>
                 ) : selectedImages.student_edu_proof ? (
                   <Image source={{ uri: selectedImages.student_edu_proof.uri }} style={styles.imagePreview} />
                 ) : (
                   <View style={styles.imageButtonContent}>
-                    <Ionicons name="document-outline" size={24} color="#234785" />
+                    <Ionicons name="document-outline" size={24} color="#666" />
                     <Text style={styles.imageButtonTextSmall}>Educational Proof</Text>
                   </View>
                 )}
               </TouchableOpacity>
             </View>
 
-            <View style={[styles.imageContainer, styles.halfWidth, styles.halfWidthSpacing]}>
+            <View style={[styles.imageContainer, styles.halfWidth]}>
               <Text style={styles.label}>ID Proof</Text>
               <TouchableOpacity
                 style={styles.imageButton}
@@ -594,14 +607,14 @@ const AddStudentScreen = () => {
               >
                 {uploadingImages.student_id_proof ? (
                   <View style={styles.imageButtonContent}>
-                    <ActivityIndicator size="small" color="#234785" />
+                    <ActivityIndicator size="small" color="#007bff" />
                     <Text style={styles.imageButtonTextSmall}>Uploading...</Text>
                   </View>
                 ) : selectedImages.student_id_proof ? (
                   <Image source={{ uri: selectedImages.student_id_proof.uri }} style={styles.imagePreview} />
                 ) : (
                   <View style={styles.imageButtonContent}>
-                    <Ionicons name="card-outline" size={24} color="#234785" />
+                    <Ionicons name="card-outline" size={24} color="#666" />
                     <Text style={styles.imageButtonTextSmall}>ID Proof</Text>
                   </View>
                 )}
@@ -617,9 +630,9 @@ const AddStudentScreen = () => {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator size="small" color="#234785" />
+              <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Ionicons name="checkmark-circle-outline" size={24} color="#234785" />
+              <Ionicons name="checkmark-circle-outline" size={24} color="#fff" />
             )}
             <Text style={styles.submitButtonText}>
               {loading ? 'Adding Student...' : 'Add Student'}
@@ -637,25 +650,20 @@ const AddStudentScreen = () => {
         onRequestClose={() => setShowCourseModal(false)}
       >
         <SafeAreaView style={styles.modalContainer}>
-          <LinearGradient
-            colors={['#234785', '#3d6aa5']}
-            style={styles.modalHeader}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          >
+          <View style={styles.modalHeader}>
             <TouchableOpacity
               style={styles.modalCloseButton}
               onPress={() => setShowCourseModal(false)}
             >
-              <Ionicons name="close" size={24} color="#ffeb44" />
+              <Ionicons name="close" size={24} color="#333" />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Select Course</Text>
             <View style={styles.modalSpacer} />
-          </LinearGradient>
+          </View>
 
           <View style={styles.modalSearchContainer}>
             <View style={styles.searchInputContainer}>
-              <Ionicons name="search-outline" size={20} color="#234785" style={styles.searchIcon} />
+              <Ionicons name="search-outline" size={20} color="#666" style={styles.searchIcon} />
               <TextInput
                 style={styles.modalSearchInput}
                 value={tempCourseSearch}
@@ -666,7 +674,7 @@ const AddStudentScreen = () => {
               />
               {tempCourseSearch ? (
                 <TouchableOpacity onPress={() => setTempCourseSearch('')}>
-                  <Ionicons name="close-circle" size={20} color="#234785" />
+                  <Ionicons name="close-circle" size={20} color="#666" />
                 </TouchableOpacity>
               ) : null}
             </View>
@@ -693,7 +701,7 @@ const AddStudentScreen = () => {
                   </Text>
                 </View>
                 {formData.course_id === course.id && (
-                  <Ionicons name="checkmark-circle" size={24} color="#234785" />
+                  <Ionicons name="checkmark-circle" size={24} color="#007bff" />
                 )}
               </TouchableOpacity>
             )}
@@ -723,23 +731,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    paddingTop: 40,
-    elevation: 4,
+    paddingTop:40,
+    elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
   backButton: {
     padding: 8,
     marginRight: 12,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 235, 68, 0.2)',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#ffeb44',
+    color: '#fff',
     flex: 1,
   },
   headerSpacer: {
@@ -754,22 +760,20 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     marginTop: 20,
-    elevation: 2,
+    elevation: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    borderTopWidth: 3,
-    borderTopColor: '#ffeb44',
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#234785',
+    color: '#333',
     marginBottom: 20,
     paddingBottom: 8,
     borderBottomWidth: 2,
-    borderBottomColor: '#ffeb44',
+    borderBottomColor: '#007bff',
   },
   inputContainer: {
     marginBottom: 20,
@@ -781,36 +785,32 @@ const styles = StyleSheet.create({
   halfWidth: {
     width: '48%',
   },
-  halfWidthSpacing: {
-    marginLeft: '4%',
-  },
   labelContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 1,
   },
   label: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#234785',
-    marginBottom: 8,
+    color: '#333',
   },
   badge: {
-    backgroundColor: '#234785',
+    backgroundColor: '#2c136eff',
     borderRadius: 12,
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginBottom: 8,
+    paddingVertical: 0,
+    marginBottom:-5,
     marginLeft: 8,
   },
   badgeText: {
-    color: '#ffeb44',
+    color: '#fff',
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   input: {
-    borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 8,
     padding: 15,
     backgroundColor: '#fff',
@@ -822,8 +822,8 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   pickerContainer: {
-    borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 8,
     backgroundColor: '#fff',
   },
@@ -831,8 +831,8 @@ const styles = StyleSheet.create({
     height: 50,
   },
   dateButton: {
-    borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 8,
     padding: 15,
     backgroundColor: '#fff',
@@ -842,28 +842,27 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 16,
-    color: '#234785',
-    fontWeight: '500',
+    color: '#333',
   },
   loadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 15,
     backgroundColor: '#fff',
-    borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 8,
   },
   loadingText: {
     marginLeft: 10,
     fontSize: 16,
-    color: '#234785',
+    color: '#666',
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#ffeb44',
+    borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 8,
     backgroundColor: '#fff',
     paddingHorizontal: 15,
@@ -872,8 +871,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   selectButton: {
-    borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 8,
     padding: 15,
     backgroundColor: '#fff',
@@ -883,8 +882,7 @@ const styles = StyleSheet.create({
   },
   selectButtonText: {
     fontSize: 16,
-    color: '#234785',
-    fontWeight: '500',
+    color: '#333',
   },
   placeholderText: {
     color: '#999',
@@ -898,21 +896,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
   },
   modalCloseButton: {
     padding: 8,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 235, 68, 0.2)',
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#ffeb44',
+    color: '#333',
     flex: 1,
     textAlign: 'center',
   },
@@ -922,12 +916,14 @@ const styles = StyleSheet.create({
   modalSearchContainer: {
     padding: 20,
     backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
   },
   modalSearchInput: {
     flex: 1,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#234785',
+    color: '#333',
   },
   modalList: {
     flex: 1,
@@ -941,9 +937,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f0f0f0',
   },
   selectedModalItem: {
-    backgroundColor: '#fff9e6',
-    borderLeftWidth: 4,
-    borderLeftColor: '#ffeb44',
+    backgroundColor: '#e3f2fd',
   },
   modalItemContent: {
     flex: 1,
@@ -951,13 +945,14 @@ const styles = StyleSheet.create({
   modalItemTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#234785',
+    color: '#333',
     marginBottom: 4,
   },
   modalItemCode: {
     fontSize: 14,
-    color: '#666',
+    color: '#007bff',
     fontWeight: '500',
+    marginBottom: 4,
   },
   emptyState: {
     flex: 1,
@@ -982,13 +977,13 @@ const styles = StyleSheet.create({
   },
   imageButton: {
     borderWidth: 2,
-    borderColor: '#ffeb44',
+    borderColor: '#ddd',
     borderStyle: 'dashed',
     borderRadius: 8,
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff9e6',
+    backgroundColor: '#fff',
     minHeight: 120,
   },
   imageButtonContent: {
@@ -996,20 +991,19 @@ const styles = StyleSheet.create({
   },
   imageButtonText: {
     fontSize: 16,
-    color: '#234785',
+    color: '#666',
     marginTop: 8,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   imageButtonTextSmall: {
     fontSize: 12,
-    color: '#234785',
+    color: '#666',
     marginTop: 4,
     textAlign: 'center',
-    fontWeight: '500',
   },
   imageButtonSubText: {
     fontSize: 12,
-    color: '#666',
+    color: '#999',
     marginTop: 4,
   },
   imagePreview: {
@@ -1022,27 +1016,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   submitButton: {
-    backgroundColor: '#ffeb44',
+    backgroundColor: '#007bff',
     borderRadius: 12,
     padding: 18,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    elevation: 5,
-    shadowColor: '#234785',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   disabledButton: {
-    backgroundColor: '#adb5bd',
-    shadowOpacity: 0,
-    elevation: 0,
+    backgroundColor: '#ccc',
   },
   submitButtonText: {
-    color: '#234785',
+    color: '#fff',
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '600',
     marginLeft: 8,
   },
   bottomSpace: {

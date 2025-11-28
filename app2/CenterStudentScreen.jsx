@@ -3,16 +3,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    RefreshControl,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  RefreshControl,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 const CenterStudentScreen = ({ navigation, route }) => {
@@ -281,7 +281,7 @@ const CenterStudentScreen = ({ navigation, route }) => {
   const renderWelcomeScreen = () => (
     <View style={styles.welcomeContainer}>
       <Ionicons name="search" size={80} color="#234785" />
-      <Text style={styles.welcomeTitle}>s</Text>
+      <Text style={styles.welcomeTitle}>Search Students</Text>
       <Text style={styles.welcomeSubtitle}>
         Enter a student's name, mobile, reg.
       </Text>
